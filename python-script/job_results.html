@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Job Search Results - 2025-06-24</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <style>
+        /* Custom CSS for additional styling */
+        .job-card {
+            transition: all 0.2s ease-in-out;
+        }
+        .job-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+        .recommendation-apply {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        }
+        .recommendation-maybe {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+        }
+        .recommendation-skip {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+        }
+        .fit-score-bar {
+            transition: width 0.3s ease;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <div class="container mx-auto px-4 py-8">
+        <!-- Header -->
+        <div class="text-center mb-8">
+            <h1 class="text-4xl font-bold text-gray-900 mb-2">Job Search Results</h1>
+            <p class="text-gray-600">Generated on June 24, 2025 at 03:21 PM</p>
+        </div>
+
+        <!-- Summary Stats -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
+            <div class="bg-white rounded-lg shadow p-6 text-center">
+                <div class="text-3xl font-bold text-gray-900">8</div>
+                <div class="text-sm text-gray-600">Total Jobs</div>
+            </div>
+            <div class="bg-white rounded-lg shadow p-6 text-center">
+                <div class="text-3xl font-bold text-green-600">2</div>
+                <div class="text-sm text-gray-600">Apply</div>
+            </div>
+            <div class="bg-white rounded-lg shadow p-6 text-center">
+                <div class="text-3xl font-bold text-yellow-600">6</div>
+                <div class="text-sm text-gray-600">Maybe</div>
+            </div>
+            <div class="bg-white rounded-lg shadow p-6 text-center">
+                <div class="text-3xl font-bold text-red-600">0</div>
+                <div class="text-sm text-gray-600">Skip</div>
+            </div>
+            <div class="bg-white rounded-lg shadow p-6 text-center">
+                <div class="text-3xl font-bold text-blue-600">3.2</div>
+                <div class="text-sm text-gray-600">Avg Fit Score</div>
+            </div>
+        </div>
+
+        <!-- Controls -->
+        <div class="bg-white rounded-lg shadow p-6 mb-8">
+            <div class="flex flex-wrap gap-4 items-center justify-between">
+                <div class="flex flex-wrap gap-2">
+                    <button id="filter-all" class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors">
+                        All (8)
+                    </button>
+                    <button id="filter-apply" class="px-4 py-2 bg-green-100 text-green-700 rounded-lg hover:bg-green-200 transition-colors">
+                        Apply (2)
+                    </button>
+                    <button id="filter-maybe" class="px-4 py-2 bg-yellow-100 text-yellow-700 rounded-lg hover:bg-yellow-200 transition-colors">
+                        Maybe (6)
+                    </button>
+                    <button id="filter-skip" class="px-4 py-2 bg-red-100 text-red-700 rounded-lg hover:bg-red-200 transition-colors">
+                        Skip (0)
+                    </button>
+                </div>
+                <div class="flex items-center gap-4">
+                    <label class="text-sm text-gray-600">Sort by:</label>
+                    <select id="sort-select" class="px-3 py-2 border border-gray-300 rounded-lg">
+                        <option value="fit_score">Fit Score</option>
+                        <option value="date_posted">Date Posted</option>
+                        <option value="company">Company</option>
+                        <option value="title">Title</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- Jobs Grid -->
+        <div id="jobs-container" class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+            <!-- Jobs will be rendered here by JavaScript -->
+        </div>
+
+        <!-- Empty State -->
+        <div id="empty-state" class="text-center py-12 hidden">
+            <i data-lucide="search" class="w-16 h-16 text-gray-400 mx-auto mb-4"></i>
+            <h3 class="text-lg font-semibold text-gray-900 mb-2">No jobs found</h3>
+            <p class="text-gray-600">Try adjusting your filters</p>
+        </div>
+    </div>
+
+    <script>
+        // Job data
+        const jobsData = [
+  {
+    "id": null,
+    "title": "Senior Software Engineer - Remote @ MetalBear",
+    "company": "MetalBear",
+    "location": "Remote @ MetalBear",
+    "url": "https://jobs.ashbyhq.com/metalbear/f1ae055f-f732-43e2-8e0d-46b70880dbbe/application?ref=remotework.FYI&src=remotework.FYI&utm_source=remotework.FYI&utm_campaign=remotework.FYI&source=remotework.FYI",
+    "date_posted": "3 days ago",
+    "salary_range": null,
+    "content_hash": "e880ff092e091862f4f4844be2a52233f28e09079f75bb7ce9650b3b6b900b8a",
+    "recommendation": "apply",
+    "confidence": 4,
+    "fit_score": 4,
+    "analysis_summary": {
+      "recommendation": "apply",
+      "confidence": 4,
+      "fit_score": 4,
+      "summary": {
+        "role": "Senior Software Engineer",
+        "company": "MetalBear (from URL, exact company name not provided in the job description)",
+        "location": "Remote",
+        "salary_range": "Not specified",
+        "key_technologies": [
+          "Python",
+          "Java",
+          "JavaScript/TypeScript",
+          "ReactJS",
+          "Django",
+          "Kubernetes",
+          "AWS/GCP"
+        ]
+      },
+      "job_summary": "The Senior Software Engineer role at MetalBear involves working remotely on full-time basis, likely focusing on developing and maintaining software products. The job requires extensive experience in software engineering with a focus on contributing to the R&D department of a tech-forward company.",
+      "fit_summary": "This position would be a good fit for Caleb due to his senior-level experience across multiple technologies and roles, although it lacks specific details about AI focus which could align better with his current interests. The remote nature matches his willingness to work remotely, and the full-time option suits his career stage.",
+      "why_good_fit": [
+        "Caleb's extensive software engineering background, especially in Python, Java, JavaScript/TypeScript, ReactJS, Django, Kubernetes, AWS/GCP, aligns well with the broad technology stack expected for a Senior Software Engineer role. He also has experience as a founding engineer and full-stack AI platform developer which likely translates to senior-level responsibilities.",
+        "The remote status of this position matches his preference for remote work."
+      ],
+      "potential_concerns": [
+        "There is no explicit mention in the job posting about focus on AI products or integration, which could be a minor concern considering Caleb's current interest in working with companies focused on AI. However, given his broad expertise and experience in building and scaling software products, he would still bring significant value to the role.",
+        "The lack of detailed information about specific responsibilities and the company's product focus may leave some ambiguity about exact day-to-day tasks and impact."
+      ]
+    },
+    "created_at": "2025-06-24T14:32:13.892969",
+    "updated_at": null
+  },
+  {
+    "id": null,
+    "title": "Epsilon3 - Software Engineer (Remote)",
+    "company": "Software Engineer (Remote)",
+    "location": "Remote",
+    "url": "https://jobs.lever.co/epsilon3/a03bb64e-920f-4235-b33e-c6f7faa912ea?source=remote.com&utm_source=remote.com&ref=remote.com",
+    "date_posted": "3 days ago",
+    "salary_range": null,
+    "content_hash": "1d23cdf5db0ded7267e11a250dc73e25151680cc87dbb95c243bee3c73df29d7",
+    "recommendation": "maybe",
+    "confidence": 4,
+    "fit_score": 3,
+    "analysis_summary": {
+      "recommendation": "maybe",
+      "confidence": 4,
+      "fit_score": 3,
+      "summary": {
+        "role": "Software Engineer (Remote)",
+        "company": "Epsilon3",
+        "location": "Atlanta, GA - remote possible",
+        "salary_range": "$120,000 - $175,000",
+        "key_technologies": [
+          "Node.js",
+          "React",
+          "Postgres",
+          "AWS GovCloud",
+          "Docker",
+          "Kubernetes"
+        ]
+      },
+      "job_summary": "Epsilon3 is a startup developing software for space mission management and operations. The Software Engineer role involves designing, building, testing, and deploying web-based operational dashboards and procedure tools using modern technologies such as Node.js, React, Postgres, AWS GovCloud, Docker, and Kubernetes.",
+      "fit_summary": "This position would allow Caleb to leverage his extensive software engineering experience in a fast-growing startup environment, but it does not focus on AI products or integration which is one of Caleb's strong interests. The role allows for remote work from anywhere in the US, aligning with Caleb's preference for flexibility.",
+      "why_good_fit": [
+        "Caleb has ample experience as a Software Engineer across various companies and projects, making him well-versed in the technologies and practices used by Epsilon3.",
+        "The opportunity to contribute to software systems that support space missions could be highly rewarding and offer new challenges compared to Caleb's past work."
+      ],
+      "potential_concerns": [
+        "While the job posting aligns with Caleb\u2019s experience, it does not emphasize AI products or integrations which Caleb is particularly interested in.",
+        "Epsilon3 requires US citizenship for this position due to future security clearance needs; while this is a standard requirement and may be necessary given the nature of their work, it can still be a limiting factor."
+      ]
+    },
+    "created_at": "2025-06-24T14:31:18.095991",
+    "updated_at": null
+  },
+  {
+    "id": null,
+    "title": "CI/CD DevOps Engineer - (25062301) - Third Eye Software",
+    "company": "Third Eye Software",
+    "location": null,
+    "url": "https://apply.workable.com/third-eye-software/j/15B024289B/",
+    "date_posted": "2 days ago",
+    "salary_range": null,
+    "content_hash": "d1397ee1fbd00538c4a079d3bd778afe243ca1e024b21c61608a8503522b594c",
+    "recommendation": "maybe",
+    "confidence": 4,
+    "fit_score": 3,
+    "analysis_summary": {
+      "recommendation": "maybe",
+      "confidence": 4,
+      "fit_score": 3,
+      "summary": {
+        "role": "CI/CD DevOps Engineer",
+        "company": "Third Eye Software",
+        "location": "Remote (United States)",
+        "salary_range": "$50-55/hr",
+        "key_technologies": [
+          "Jenkins",
+          "GitHub Actions",
+          "Docker",
+          "Bash",
+          "JavaScript"
+        ]
+      },
+      "job_summary": "The CI/CD DevOps Engineer position at Third Eye Software involves migrating application repos from legacy CI tools to GitHub Actions paved road pipelines. The role requires hands-on experience with CI/CD, build tooling, and containerization.",
+      "fit_summary": "This role aligns moderately well with Caleb's background in infrastructure, DevOps, and continuous integration/deployment practices but does not fit his preference for an AI-focused company or product.",
+      "why_good_fit": [
+        "Caleb has a strong background in automation and CI/CD tools such as Jenkins and Maven which are directly relevant to the role.",
+        "He also possesses extensive experience with scripting languages like Bash, JavaScript, and YAML, aligning well with the required skill set."
+      ],
+      "potential_concerns": [
+        "The job posting does not specifically mention AI or machine learning, which is a key preference for Caleb.",
+        "While he has significant professional experience in DevOps and software engineering, the role requires specific expertise that may have gaps if Caleb has less experience with GitHub Actions and Concourse."
+      ]
+    },
+    "created_at": "2025-06-24T14:30:23.442533",
+    "updated_at": null
+  },
+  {
+    "id": null,
+    "title": "Job Application for Software Engineer (L2) at Twilio",
+    "company": "Twilio",
+    "location": null,
+    "url": "http://job-boards.greenhouse.io/twilio/jobs/6988195",
+    "date_posted": "2 days ago",
+    "salary_range": null,
+    "content_hash": "66c937e71a6c7c8ad9a01072ac8d0df8bcdcc503e4d666ba10a674bc9774c934",
+    "recommendation": "maybe",
+    "confidence": 4,
+    "fit_score": 3,
+    "analysis_summary": {
+      "recommendation": "maybe",
+      "confidence": 4,
+      "fit_score": 3,
+      "summary": {
+        "role": "Software Engineer (L2)",
+        "company": "Twilio",
+        "location": "Remote, India",
+        "salary_range": "Not specified",
+        "key_technologies": [
+          "Java",
+          "Spring",
+          "Hibernate",
+          "MySQL",
+          "AWS"
+        ]
+      },
+      "job_summary": "This role involves designing and implementing high-quality Java-based applications and microservices for Twilio's IAM products. The Software Engineer (L2) will work with cross-functional teams, participate in code reviews, troubleshoot issues, manage cloud-based systems, and document technical specifications.",
+      "fit_summary": "The role is a fit technically as Caleb has extensive experience with many of the required technologies. However, it does not align well with his preference for AI-focused companies or a specific location like Atlanta, GA, and the remote requirement based in India may be restrictive given his current context.",
+      "why_good_fit": [
+        "Caleb possesses significant software engineering experience that includes backend development, which matches the technical requirements of this position.",
+        "He has proven skills with Java frameworks (Spring), similar to what is required for the role."
+      ],
+      "potential_concerns": [
+        "The job posting specifies a remote location in India, which may not align well with Caleb's preference for Atlanta or other US-based opportunities.",
+        "Twilio focuses on communications rather than AI technologies as Caleb prefers.",
+        "There are gaps between Caleb\u2019s experience and the specific requirement of 3+ years of Java development."
+      ]
+    },
+    "created_at": "2025-06-24T14:29:39.190427",
+    "updated_at": null
+  },
+  {
+    "id": null,
+    "title": "Job Application for Senior Software Engineer (remote, US) at One ...",
+    "company": "Onemodel",
+    "location": "Remote",
+    "url": "http://job-boards.greenhouse.io/onemodel/jobs/4770651007",
+    "date_posted": "2 days ago",
+    "salary_range": null,
+    "content_hash": "45569cf0b55c4e4387a46d497ac055b8283960215b4eefe2f8f61cd49db4aa02",
+    "recommendation": "maybe",
+    "confidence": 4,
+    "fit_score": 3,
+    "analysis_summary": {
+      "recommendation": "maybe",
+      "confidence": 4,
+      "fit_score": 3,
+      "summary": {
+        "role": "Senior Software Engineer",
+        "company": "One Model",
+        "location": "Remote (within specified metro areas) or in-person collaboration",
+        "salary_range": "$110,000 - $140,000 USD",
+        "key_technologies": [
+          "C#",
+          "React",
+          ".NET",
+          "Kubernetes",
+          "AWS/Azure"
+        ]
+      },
+      "job_summary": "The Senior Software Engineer position at One Model involves building and enhancing features within their people analytics platform. The role requires full-stack technical skills, particularly in C# and React, as well as experience with .NET, Kubernetes, AWS or Azure.",
+      "fit_summary": "Caleb is a strong fit due to his extensive experience in software engineering and AI-related projects but the job posting's requirement for specific technologies (C#, React) and locations do not fully align with his expertise or preferred location.",
+      "why_good_fit": [
+        "Caleb has substantial experience building full-stack applications, contributing to machine learning platforms, and working within a fast-growing startup environment similar to One Model.",
+        "His past roles at Charm AI Lab as a Co-Founder/Founding Engineer and Fold as a Software Engineer involve complex technical challenges that parallel the requirements of this role."
+      ],
+      "potential_concerns": [
+        "The specific requirement for C# and React may not align with Caleb's more recent experience in Python, TypeScript, and other languages.",
+        "Caleb prefers to work remotely or ideally from Atlanta, GA; however, One Model requires applicants based in Minneapolis, DC, Portland, or Austin for in-person interviews and occasional collaboration."
+      ]
+    },
+    "created_at": "2025-06-24T14:28:52.290854",
+    "updated_at": null
+  },
+  {
+    "id": null,
+    "title": "Software Engineer - Blockchain Data (fully remote) @ Dune",
+    "company": "Dune",
+    "location": "Blockchain Data (fully remote) @ Dune",
+    "url": "https://jobs.ashbyhq.com/dune/3fe0f4b2-b70a-4900-b648-cfb245896b80/application",
+    "date_posted": "2 days ago",
+    "salary_range": null,
+    "content_hash": "11a6bafabf628cdaea52e819f218611209802ae9b0ee5d88617e0d9227fba8bb",
+    "recommendation": "maybe",
+    "confidence": 4,
+    "fit_score": 3,
+    "analysis_summary": {
+      "recommendation": "maybe",
+      "confidence": 4,
+      "fit_score": 3,
+      "summary": {
+        "role": "Software Engineer - Blockchain Data",
+        "company": "Dune",
+        "location": "Remote (open to Europe and US based locations)",
+        "salary_range": "Not specified",
+        "key_technologies": [
+          "Blockchain data pipelines",
+          "Python",
+          "SQL",
+          "DevOps"
+        ]
+      },
+      "job_summary": "The Software Engineer - Blockchain Data role involves working with Dune, a company focused on blockchain analytics. The position is fully remote and requires expertise in building and maintaining data pipelines using Python, SQL, and DevOps tools.",
+      "fit_summary": "This job posting aligns partially with Caleb's technical skills but doesn't closely match his career focus on AI products or integrations. Given that the role does not specifically require experience in AI, it is still a decent fit due to Caleb\u2019s broad software engineering background.",
+      "why_good_fit": [
+        "Caleb has extensive experience in Python and SQL, which are key technologies for this position.",
+        "He possesses strong DevOps skills relevant to managing data pipelines.",
+        "The remote nature of the role aligns with Caleb's preference for a flexible work environment."
+      ],
+      "potential_concerns": [
+        "While Caleb\u2019s background is robust in software engineering and AI, the job posting does not highlight any specific focus on integrating or building AI products, which might be less appealing.",
+        "The preference for working in EST/GMT/CEST time zones may require some flexibility if Caleb prefers to work in other time zones."
+      ]
+    },
+    "created_at": "2025-06-24T14:28:06.598224",
+    "updated_at": null
+  },
+  {
+    "id": null,
+    "title": "Job Application for Senior Software Engineer (Remote) at Qwiet AI",
+    "company": "Shiftleft",
+    "location": "Remote",
+    "url": "https://job-boards.greenhouse.io/shiftleft/jobs/8046427002",
+    "date_posted": "2 days ago",
+    "salary_range": null,
+    "content_hash": "14894701620ef098df2881748b03e2fc96a83243b534cd33f94a9062d3969fbb",
+    "recommendation": "apply",
+    "confidence": 5,
+    "fit_score": 4,
+    "analysis_summary": {
+      "recommendation": "apply",
+      "confidence": 5,
+      "fit_score": 4,
+      "summary": {
+        "role": "Senior Software Engineer (Remote)",
+        "company": "Qwiet AI",
+        "location": "Remote",
+        "salary_range": "Not specified",
+        "key_technologies": [
+          "Python",
+          "Java/Kotlin",
+          "JavaScript/TypeScript",
+          "ReactJS",
+          "Flask",
+          "Django",
+          "AWS",
+          "Azure"
+        ]
+      },
+      "job_summary": "The Senior Software Engineer position at Qwiet AI involves developing and maintaining software products that integrate AI. This role requires working with a variety of technologies, including Python, Java/Kotlin, and JavaScript/TypeScript, while contributing to the company's mission in providing innovative solutions.",
+      "fit_summary": "This job would be a good fit for Caleb as it aligns well with his extensive experience in software engineering and AI development. The remote nature also matches his preference for flexibility.",
+      "why_good_fit": [
+        "Caleb has substantial experience working on both full-stack and backend technologies, which this role requires.",
+        "His work at Charm involves building an AI-powered chatbot and developing a search orchestration engine, aligning well with Qwiet AI\u2019s focus on AI integration.",
+        "The remote nature of the position matches Caleb's open location preference."
+      ],
+      "potential_concerns": [
+        "While Caleb has a strong background in software engineering and AI, specific details about the role\u2019s responsibilities are not provided, making it harder to gauge exact alignment with his experience.",
+        "The salary range is unspecified, which could be a concern for someone looking to set expectations."
+      ]
+    },
+    "created_at": "2025-06-24T14:27:22.018094",
+    "updated_at": null
+  },
+  {
+    "id": null,
+    "title": "Computer Vision Software Engineer (Remote - Germany ...",
+    "company": "Jobs By Workable",
+    "location": "Germany ...",
+    "url": "https://jobs.workable.com/view/k8b6vHwFSe1grhwpkFyoUa/computer-vision-software-engineer-(remote---germany)-in-germany-at-jobgether",
+    "date_posted": "13 hours ago",
+    "salary_range": null,
+    "content_hash": "368d419099c8eb0708279f9099064d8fb8ab58584afbc89e2dd55761d3fe79c8",
+    "recommendation": "maybe",
+    "confidence": 4,
+    "fit_score": 3,
+    "analysis_summary": {
+      "recommendation": "maybe",
+      "confidence": 4,
+      "fit_score": 3,
+      "summary": {
+        "role": "Computer Vision Software Engineer (Remote - Germany)",
+        "company": "Jobgether (on behalf of Planet)",
+        "location": "Remote with option to collaborate in offices across Germany",
+        "salary_range": "Not specified",
+        "key_technologies": [
+          "Python",
+          "Unix/Linux environments",
+          "High-resolution imaging systems",
+          "Hyperspectral data processing"
+        ]
+      },
+      "job_summary": "The Computer Vision Software Engineer position involves developing and optimizing satellite imaging systems, contributing to image quality assessment, and working across various engineering teams. The role is remote with opportunities for in-person collaboration within Germany.",
+      "fit_summary": "Caleb has significant software development experience but lacks direct expertise in computer vision or satellite imaging technologies. While the remote nature aligns with his preferences, there are notable gaps in technical specialization required by this role.",
+      "why_good_fit": [
+        "The job is remote which matches Caleb's open-to-remote preference",
+        "Caleb has extensive experience in software engineering and full-stack development across various platforms including Python, which could be adaptable to the computer vision field"
+      ],
+      "potential_concerns": [
+        "Lack of direct experience or education in computer vision, satellite imaging, or high-resolution imaging systems",
+        "The role's specific domain may not align with Caleb\u2019s preference for AI-focused roles, although Planet does incorporate AI into its Earth observation technology",
+        "Salary range is unspecified which could be a concern"
+      ]
+    },
+    "created_at": "2025-06-24T14:26:33.997701",
+    "updated_at": null
+  }
+];
+        
+        // State
+        let currentFilter = 'all';
+        let currentSort = 'fit_score';
+        
+        // Initialize Lucide icons
+        lucide.createIcons();
+        
+        // DOM elements
+        const jobsContainer = document.getElementById('jobs-container');
+        const emptyState = document.getElementById('empty-state');
+        const sortSelect = document.getElementById('sort-select');
+        
+        // Filter buttons
+        const filterButtons = {
+            'all': document.getElementById('filter-all'),
+            'apply': document.getElementById('filter-apply'),
+            'maybe': document.getElementById('filter-maybe'),
+            'skip': document.getElementById('filter-skip')
+        };
+        
+        // Utility functions
+        function formatDate(dateString) {
+            if (!dateString) return 'Not specified';
+            const date = new Date(dateString);
+            return date.toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric'
+            });
+        }
+        
+        function getRecommendationColor(recommendation) {
+            switch(recommendation) {
+                case 'apply': return 'recommendation-apply';
+                case 'maybe': return 'recommendation-maybe';
+                case 'skip': return 'recommendation-skip';
+                default: return 'bg-gray-500';
+            }
+        }
+        
+        function getFitScoreColor(score) {
+            if (score >= 4) return 'bg-green-500';
+            if (score >= 3) return 'bg-yellow-500';
+            if (score >= 2) return 'bg-orange-500';
+            return 'bg-red-500';
+        }
+        
+        function createJobCard(job) {
+            const analysis = job.analysis_summary || {};
+            const summary = analysis.summary || {};
+            
+            return `
+                <div class="job-card bg-white rounded-lg shadow-md overflow-hidden" data-recommendation="${job.recommendation}">
+                    <!-- Header -->
+                    <div class="p-6 pb-4">
+                        <div class="flex items-start justify-between mb-3">
+                            <div class="flex-1">
+                                <h3 class="text-xl font-semibold text-gray-900 mb-1">${job.title || 'Unknown Title'}</h3>
+                                <p class="text-gray-600 flex items-center">
+                                    <i data-lucide="building" class="w-4 h-4 mr-1"></i>
+                                    ${job.company || 'Unknown Company'}
+                                </p>
+                            </div>
+                            <div class="flex flex-col items-end gap-2">
+                                <span class="px-3 py-1 text-xs font-semibold text-white rounded-full ${getRecommendationColor(job.recommendation)}">
+                                    ${job.recommendation?.toUpperCase() || 'UNKNOWN'}
+                                </span>
+                                <div class="text-sm text-gray-500">
+                                    Fit: ${job.fit_score || 'N/A'}/5
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-center text-sm text-gray-600 mb-3">
+                            <i data-lucide="map-pin" class="w-4 h-4 mr-1"></i>
+                            <span>${job.location || 'Location not specified'}</span>
+                            ${job.salary_range ? `<span class="mx-2">•</span><span>${job.salary_range}</span>` : ''}
+                        </div>
+                        
+                        <!-- Fit Score Bar -->
+                        <div class="mb-4">
+                            <div class="flex justify-between text-sm mb-1">
+                                <span class="text-gray-600">Fit Score</span>
+                                <span class="font-semibold">${job.fit_score || 0}/5</span>
+                            </div>
+                            <div class="w-full bg-gray-200 rounded-full h-2">
+                                <div class="fit-score-bar h-2 rounded-full ${getFitScoreColor(job.fit_score)}" 
+                                     style="width: ${((job.fit_score || 0) / 5) * 100}%"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Content -->
+                    <div class="px-6 pb-4">
+                        ${analysis.job_summary ? `
+                            <div class="mb-4">
+                                <h4 class="font-semibold text-gray-900 mb-2">Job Summary</h4>
+                                <p class="text-sm text-gray-700">${analysis.job_summary}</p>
+                            </div>
+                        ` : ''}
+                        
+                        ${analysis.fit_summary ? `
+                            <div class="mb-4">
+                                <h4 class="font-semibold text-gray-900 mb-2">Fit Analysis</h4>
+                                <p class="text-sm text-gray-700">${analysis.fit_summary}</p>
+                            </div>
+                        ` : ''}
+                        
+                        ${analysis.why_good_fit && analysis.why_good_fit.length > 0 ? `
+                            <div class="mb-4">
+                                <h4 class="font-semibold text-green-700 mb-2">Strengths</h4>
+                                <ul class="text-sm text-gray-700 space-y-1">
+                                    ${analysis.why_good_fit.map(item => `<li class="flex items-start"><i data-lucide="check" class="w-4 h-4 text-green-500 mr-2 mt-0.5 flex-shrink-0"></i>${item}</li>`).join('')}
+                                </ul>
+                            </div>
+                        ` : ''}
+                        
+                        ${analysis.potential_concerns && analysis.potential_concerns.length > 0 ? `
+                            <div class="mb-4">
+                                <h4 class="font-semibold text-red-700 mb-2">Concerns</h4>
+                                <ul class="text-sm text-gray-700 space-y-1">
+                                    ${analysis.potential_concerns.map(item => `<li class="flex items-start"><i data-lucide="alert-circle" class="w-4 h-4 text-red-500 mr-2 mt-0.5 flex-shrink-0"></i>${item}</li>`).join('')}
+                                </ul>
+                            </div>
+                        ` : ''}
+                    </div>
+                    
+                    <!-- Footer -->
+                    <div class="px-6 py-4 bg-gray-50 border-t">
+                        <div class="flex items-center justify-between">
+                            <div class="text-sm text-gray-600">
+                                Posted: ${formatDate(job.date_posted)}
+                            </div>
+                            <a href="${job.url}" target="_blank" rel="noopener noreferrer" 
+                               class="inline-flex items-center px-3 py-2 text-sm font-medium text-blue-600 hover:text-blue-800 transition-colors">
+                                <span>View Job</span>
+                                <i data-lucide="external-link" class="w-4 h-4 ml-1"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+        
+        function filterJobs() {
+            let filtered = jobsData;
+            
+            // Apply recommendation filter
+            if (currentFilter !== 'all') {
+                filtered = filtered.filter(job => job.recommendation === currentFilter);
+            }
+            
+            return filtered;
+        }
+        
+        function sortJobs(jobs) {
+            return [...jobs].sort((a, b) => {
+                switch(currentSort) {
+                    case 'fit_score':
+                        return (b.fit_score || 0) - (a.fit_score || 0);
+                    case 'date_posted':
+                        return new Date(b.date_posted || 0) - new Date(a.date_posted || 0);
+                    case 'company':
+                        return (a.company || '').localeCompare(b.company || '');
+                    case 'title':
+                        return (a.title || '').localeCompare(b.title || '');
+                    default:
+                        return 0;
+                }
+            });
+        }
+        
+        function renderJobs() {
+            const filtered = filterJobs();
+            const sorted = sortJobs(filtered);
+            
+            if (sorted.length === 0) {
+                jobsContainer.classList.add('hidden');
+                emptyState.classList.remove('hidden');
+                return;
+            }
+            
+            jobsContainer.classList.remove('hidden');
+            emptyState.classList.add('hidden');
+            
+            jobsContainer.innerHTML = sorted.map(createJobCard).join('');
+            
+            // Re-initialize Lucide icons for new content
+            lucide.createIcons();
+        }
+        
+        function updateFilterButtons() {
+            Object.entries(filterButtons).forEach(([filter, button]) => {
+                if (filter === currentFilter) {
+                    button.classList.add('bg-blue-500', 'text-white');
+                    button.classList.remove('bg-gray-200', 'text-gray-700', 'bg-green-100', 'text-green-700', 'bg-yellow-100', 'text-yellow-700', 'bg-red-100', 'text-red-700');
+                } else {
+                    button.classList.remove('bg-blue-500', 'text-white');
+                    switch(filter) {
+                        case 'all':
+                            button.classList.add('bg-gray-200', 'text-gray-700');
+                            break;
+                        case 'apply':
+                            button.classList.add('bg-green-100', 'text-green-700');
+                            break;
+                        case 'maybe':
+                            button.classList.add('bg-yellow-100', 'text-yellow-700');
+                            break;
+                        case 'skip':
+                            button.classList.add('bg-red-100', 'text-red-700');
+                            break;
+                    }
+                }
+            });
+        }
+        
+        // Event listeners
+        Object.entries(filterButtons).forEach(([filter, button]) => {
+            button.addEventListener('click', () => {
+                currentFilter = filter;
+                updateFilterButtons();
+                renderJobs();
+            });
+        });
+        
+        sortSelect.addEventListener('change', (e) => {
+            currentSort = e.target.value;
+            renderJobs();
+        });
+        
+        // Initial render
+        updateFilterButtons();
+        renderJobs();
+    </script>
+</body>
+</html>
