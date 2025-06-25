@@ -11,7 +11,7 @@ import re
 import hashlib
 from typing import List, Optional
 
-from job_types import Job, load_jobs_from_file, save_jobs_to_file
+from job_types import Job
 from data import RESUME, PREFERENCES
 from repositories.factory import RepositoryFactory
 from repositories.base import ProcessedJob
