@@ -1,0 +1,38 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String @id
+  createdAt DateTime @default(now())
+  jobs      ProcessedJob[]
+}
+
+model ProcessedJob {
+  id              String @id @default(cuid())
+  userId          String
+  title           String
+  company         String
+  location        String?
+  salary          String?
+  url             String
+  content         String
+  recommendation  String  // apply/maybe/skip
+  fitScore        Int     // 1-5
+  confidence      Int     // 1-5
+  summary         String
+  analysis        String
+  contentHash     String
+  createdAt       DateTime @default(now())
+  
+  user User @relation(fields: [userId], references: [id])
+  @@index([userId])
+}
