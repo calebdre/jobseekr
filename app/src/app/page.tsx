@@ -1,158 +1,64 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useEffect } from "react";
 import { useSearchSession } from "@/hooks/useSearchSession";
+import { useUserData } from "@/hooks/useUserData";
+import { useJobSearch } from "@/hooks/useJobSearch";
+import { useJobResults } from "@/hooks/useJobResults";
+import JobCard from "@/components/JobCard";
 
 export default function Home() {
-  const [userId, setUserId] = useState<string>("");
-  const [resumeText, setResumeText] = useState("");
-  const [preferences, setPreferences] = useState("");
-  const [jobTitle, setJobTitle] = useState("");
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  // User data and localStorage management
+  const {
+    userId,
+    resumeText,
+    preferences,
+    jobTitle,
+    handleResumeChange,
+    handlePreferencesChange,
+    handleJobTitleChange,
+  } = useUserData();
 
-  // Generate UUID
-  const generateUserId = () => {
-    return 'user_' + Math.random().toString(36).substr(2, 9) + Date.now();
-  };
+  // Job results management
+  const {
+    jobResults,
+    statusFilter,
+    filteredJobs,
+    setJobResults,
+    setStatusFilter,
+    refreshJobResults,
+    updateJobStatus,
+    initializeJobData,
+  } = useJobResults({ userId });
 
-  // Initialize userId and load saved data
+  // Job search functionality
+  const {
+    isSearching,
+    progress,
+    skippedJobs,
+    searchComplete,
+    activeSearchSession,
+    setIsSearching,
+    setProgress,
+    setSearchComplete,
+    setActiveSearchSession,
+    handleSubmit,
+    handleCancelSearch,
+    handleFileUpload,
+    fileInputRef,
+  } = useJobSearch({
+    userId,
+    onSearchComplete: refreshJobResults,
+    onJobResult: (job) => setJobResults(prev => [...prev, job]),
+    onJobSkipped: () => {}, // Already handled in useJobSearch
+  });
+
+  // Initialize data on component mount
   useEffect(() => {
-    let storedUserId = localStorage.getItem('jobseekr_userId');
-    
-    if (!storedUserId) {
-      storedUserId = generateUserId();
-      localStorage.setItem('jobseekr_userId', storedUserId);
+    if (userId) {
+      initializeJobData(setActiveSearchSession, setIsSearching, setProgress, setSearchComplete);
     }
-    
-    setUserId(storedUserId);
-    
-    // Load saved resume, preferences, and job title
-    const savedResume = localStorage.getItem('jobseekr_resume');
-    const savedPreferences = localStorage.getItem('jobseekr_preferences');
-    const savedJobTitle = localStorage.getItem('jobseekr_jobTitle');
-    
-    if (savedResume) setResumeText(savedResume);
-    if (savedPreferences) setPreferences(savedPreferences);
-    if (savedJobTitle) setJobTitle(savedJobTitle);
-
-    // Check for active search session and fetch existing jobs
-    const initializeData = async () => {
-      try {
-        let searchData = null;
-        
-        // Check for active search session
-        const searchStatusResponse = await fetch(`/api/search/status?userId=${encodeURIComponent(storedUserId)}`);
-        if (searchStatusResponse.ok) {
-          searchData = await searchStatusResponse.json();
-          if (searchData.hasActiveSearch) {
-            setActiveSearchSession(searchData.session);
-            // Only set isSearching to true if search is actually in progress
-            if (searchData.session.status === 'in_progress') {
-              setIsSearching(true);
-            }
-            setProgress({
-              current: searchData.session.progress.current,
-              total: searchData.session.progress.total,
-              status: searchData.session.progress.message
-            });
-            // Real-time subscription will be started automatically by the useSearchSession hook
-            console.log('Active search found, will start real-time subscription:', searchData.session);
-          }
-        }
-
-        // Fetch existing jobs
-        const jobsResponse = await fetch(`/api/jobs?userId=${encodeURIComponent(storedUserId)}`);
-        if (jobsResponse.ok) {
-          const jobsData = await jobsResponse.json();
-          if (jobsData.jobs && jobsData.jobs.length > 0) {
-            setJobResults(jobsData.jobs);
-            if (!searchData?.hasActiveSearch) {
-              setSearchComplete(true);
-            }
-          }
-        }
-      } catch (error) {
-        console.error('Error initializing data:', error);
-      }
-    };
-
-    initializeData();
-  }, []);
-
-  // Save resume to localStorage when it changes
-  const handleResumeChange = (value: string) => {
-    setResumeText(value);
-    localStorage.setItem('jobseekr_resume', value);
-  };
-
-  // Save preferences to localStorage when they change
-  const handlePreferencesChange = (value: string) => {
-    setPreferences(value);
-    localStorage.setItem('jobseekr_preferences', value);
-  };
-
-  // Save job title to localStorage when it changes
-  const handleJobTitleChange = (value: string) => {
-    setJobTitle(value);
-    localStorage.setItem('jobseekr_jobTitle', value);
-  };
-
-  // Function to refresh job results
-  const refreshJobResults = async () => {
-    if (!userId) return;
-    
-    try {
-      const response = await fetch(`/api/jobs?userId=${encodeURIComponent(userId)}`);
-      if (response.ok) {
-        const data = await response.json();
-        setJobResults(data.jobs || []);
-      }
-    } catch (error) {
-      console.error('Error refreshing job results:', error);
-    }
-  };
-
-  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (!file || file.type !== "application/pdf") {
-      alert("Please select a PDF file");
-      return;
-    }
-
-    try {
-      // Dynamically import PDF.js only on the client side
-      const pdfjs = await import('pdfjs-dist');
-      
-      // Set worker source to CDN
-      pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.mjs`;
-      
-      const { getDocument } = pdfjs;
-      
-      const arrayBuffer = await file.arrayBuffer();
-      const pdf = await getDocument({ data: arrayBuffer }).promise;
-      let text = "";
-      
-      for (let i = 1; i <= pdf.numPages; i++) {
-        const page = await pdf.getPage(i);
-        const textContent = await page.getTextContent();
-        text += textContent.items.map((item: any) => item.str).join(" ") + "\n";
-      }
-      
-      handleResumeChange(text);
-    } catch (error) {
-      console.error("Error parsing PDF:", error);
-      alert("Error reading PDF file");
-    }
-  };
-
-  // Job search state
-  const [isSearching, setIsSearching] = useState(false);
-  const [progress, setProgress] = useState({ current: 0, total: 0, status: '' });
-  const [jobResults, setJobResults] = useState<any[]>([]);
-  const [skippedJobs, setSkippedJobs] = useState<any[]>([]);
-  const [searchComplete, setSearchComplete] = useState(false);
-  const [activeSearchSession, setActiveSearchSession] = useState<any>(null);
-  const [statusFilter, setStatusFilter] = useState<string>('all');
+  }, [userId, initializeJobData, setActiveSearchSession, setIsSearching, setProgress, setSearchComplete]);
 
   // Real-time search session subscription
   const { cancelSubscription } = useSearchSession({
@@ -177,175 +83,18 @@ export default function Home() {
     }
   });
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  // Enhanced handleSubmit that resets job results before search
+  const handleFormSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    if (!resumeText.trim()) {
-      alert("Please enter your resume");
-      return;
-    }
-    
-    if (!jobTitle.trim()) {
-      alert("Please enter a job title to search for");
-      return;
-    }
-
-    // Check if search is already in progress
-    if (isSearching || activeSearchSession) {
-      alert("Search already in progress. Please wait for it to complete.");
-      return;
-    }
-
-    // Reset state
-    setIsSearching(true);
-    setSearchComplete(false);
-    setJobResults([]);
-    setSkippedJobs([]);
-    setProgress({ current: 0, total: 0, status: 'Starting job search...' });
-
-    try {
-      // Use fetch for POST request with SSE
-      const response = await fetch('/api/search/stream', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          userId,
-          resume: resumeText,
-          preferences: preferences,
-          jobTitle: jobTitle
-        })
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      const reader = response.body?.getReader();
-      if (!reader) {
-        throw new Error('No response body reader available');
-      }
-
-      const decoder = new TextDecoder();
-
-      // Read the stream
-      while (true) {
-        const { done, value } = await reader.read();
-        
-        if (done) {
-          setIsSearching(false);
-          break;
-        }
-
-        // Decode and process the chunk
-        const chunk = decoder.decode(value, { stream: true });
-        const lines = chunk.split('\n');
-
-        for (const line of lines) {
-          if (line.startsWith('data: ')) {
-            try {
-              const jsonStr = line.slice(6); // Remove 'data: ' prefix
-              if (jsonStr.trim()) {
-                const data = JSON.parse(jsonStr);
-                
-                switch (data.type) {
-                  case 'progress':
-                    setProgress(data.data);
-                    break;
-                    
-                  case 'job':
-                    setJobResults(prev => [...prev, data.data]);
-                    break;
-                    
-                  case 'job_skipped':
-                    setSkippedJobs(prev => [...prev, data.data]);
-                    break;
-                    
-                  case 'complete':
-                    setSearchComplete(true);
-                    setProgress(prev => ({ ...prev, status: data.data.message }));
-                    setIsSearching(false);
-                    return; // Exit the loop
-                    
-                  case 'error':
-                    console.error('Search error:', data.data.message);
-                    alert(`Search error: ${data.data.message}`);
-                    setIsSearching(false);
-                    return; // Exit the loop
-                }
-              }
-            } catch (error) {
-              console.error('Error parsing SSE data:', error);
-            }
-          }
-        }
-      }
-
-    } catch (error) {
-      console.error('Error starting search:', error);
-      setIsSearching(false);
-      alert('Failed to start job search');
-    }
+    setJobResults([]); // Clear previous results
+    await handleSubmit(resumeText, preferences, jobTitle);
   };
 
-  // Function to cancel active search
-  const handleCancelSearch = async () => {
-    if (!userId) return;
-    
-    try {
-      const response = await fetch(`/api/search/status?userId=${encodeURIComponent(userId)}`, {
-        method: 'DELETE'
-      });
-      
-      if (response.ok) {
-        setIsSearching(false);
-        setActiveSearchSession(null);
-        cancelSubscription();
-        setProgress({ current: 0, total: 0, status: 'Search cancelled' });
-        console.log('Search cancelled successfully');
-      }
-    } catch (error) {
-      console.error('Error cancelling search:', error);
-      alert('Failed to cancel search');
-    }
+  // Enhanced cancel that includes subscription cleanup
+  const handleFormCancelSearch = async () => {
+    await handleCancelSearch();
+    cancelSubscription();
   };
-
-  // Function to update job status
-  const updateJobStatus = async (jobId: string, status: string) => {
-    try {
-      const response = await fetch(`/api/jobs/${jobId}/status`, {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ status })
-      });
-
-      if (response.ok) {
-        // Update local state
-        setJobResults(prev => 
-          prev.map(job => 
-            job.id === jobId 
-              ? { ...job, status, statusUpdatedAt: new Date().toISOString() }
-              : job
-          )
-        );
-      } else {
-        alert('Failed to update job status');
-      }
-    } catch (error) {
-      console.error('Error updating job status:', error);
-      alert('Failed to update job status');
-    }
-  };
-
-  // Filter jobs based on status
-  const filteredJobs = jobResults.filter(job => {
-    if (statusFilter === 'all') return true;
-    if (statusFilter === 'to_apply') return job.status === 'unread' && job.recommendation === 'apply';
-    return job.status === statusFilter;
-  });
 
   const preferencesPlaceholder = `Looking for remote software engineering roles, preferably full-stack or frontend positions. Open to $80k-120k salary range. Interested in startups or mid-size companies with good work-life balance. No interest in finance or insurance industries.`;
 
@@ -357,7 +106,7 @@ export default function Home() {
             Job Search Setup
           </h1>
           
-          <form onSubmit={handleSubmit} className="space-y-8">
+          <form onSubmit={handleFormSubmit} className="space-y-8">
             {/* Job Title Section */}
             <div>
               <label htmlFor="jobTitle" className="block text-lg font-medium text-gray-700 mb-1">
@@ -410,7 +159,7 @@ export default function Home() {
                 ref={fileInputRef}
                 type="file"
                 accept=".pdf"
-                onChange={handleFileUpload}
+                onChange={(e) => handleFileUpload(e, handleResumeChange)}
                 className="hidden"
               />
               
@@ -461,7 +210,7 @@ export default function Home() {
               {(isSearching || activeSearchSession) && (
                 <button
                   type="button"
-                  onClick={handleCancelSearch}
+                  onClick={handleFormCancelSearch}
                   className="font-medium py-3 px-6 rounded-lg bg-red-600 hover:bg-red-700 text-white transition-colors duration-200 text-lg"
                 >
                   Cancel Search
@@ -475,7 +224,7 @@ export default function Home() {
             <div className="mt-8 bg-blue-50 border border-blue-200 rounded-lg p-6">
               <h3 className="text-lg font-semibold text-blue-800 mb-2">Search in Progress</h3>
               <p className="text-blue-700 mb-4">
-                You have an active search for "{activeSearchSession.jobTitle}" that started at{' '}
+                You have an active search for &quot;{activeSearchSession.jobTitle}&quot; that started at{' '}
                 {new Date(activeSearchSession.createdAt).toLocaleTimeString()}.
               </p>
               <p className="text-blue-700 text-sm">
@@ -545,201 +294,12 @@ export default function Home() {
               </div>
               
               <div className="space-y-6">
-                {filteredJobs.map((job, index) => (
-                  <div key={job.id} className={`bg-white border rounded-lg p-6 shadow-sm relative ${
-                    job.status === 'applied' 
-                      ? 'border-green-200 bg-green-50/30' 
-                      : job.status === 'not_interested'
-                      ? 'border-gray-200 bg-gray-50/50 opacity-75'
-                      : job.status === 'saved_for_later'
-                      ? 'border-yellow-200 bg-yellow-50/30'
-                      : 'border-gray-200'
-                  }`}>
-                    {/* Status Badge */}
-                    {job.status !== 'unread' && (
-                      <div className="absolute top-4 right-4">
-                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                          job.status === 'applied' 
-                            ? 'bg-green-100 text-green-800'
-                            : job.status === 'saved_for_later'
-                            ? 'bg-yellow-100 text-yellow-800'
-                            : job.status === 'not_interested'
-                            ? 'bg-gray-100 text-gray-600'
-                            : 'bg-blue-100 text-blue-800'
-                        }`}>
-                          {job.status === 'applied' ? '✓ Applied' 
-                           : job.status === 'saved_for_later' ? '⭐ Saved'
-                           : job.status === 'not_interested' ? '✗ Not Interested'
-                           : 'Unread'}
-                        </span>
-                      </div>
-                    )}
-
-                    <div className="flex justify-between items-start mb-4">
-                      <div className="flex-1 pr-20">
-                        <h3 className="text-lg font-semibold text-gray-900 mb-1">
-                          <a 
-                            href={job.url} 
-                            target="_blank" 
-                            rel="noopener noreferrer"
-                            className="hover:text-blue-600 transition-colors"
-                          >
-                            {job.title}
-                          </a>
-                        </h3>
-                        <p className="text-gray-600 mb-2">{job.company}</p>
-                        <div className="flex flex-wrap gap-4 text-sm text-gray-500 mb-3">
-                          {job.location && <span>📍 {job.location}</span>}
-                          {job.salary && <span className="text-green-600 font-medium">💰 {job.salary}</span>}
-                        </div>
-                        
-                        {/* Key Technologies */}
-                        {job.key_technologies && job.key_technologies.length > 0 && (
-                          <div className="flex flex-wrap gap-2 mb-3">
-                            {job.key_technologies.map((tech, techIndex) => (
-                              <span 
-                                key={techIndex}
-                                className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-md"
-                              >
-                                {tech}
-                              </span>
-                            ))}
-                          </div>
-                        )}
-                      </div>
-                      
-                      {/* Recommendation Badge */}
-                      <div className="ml-4 flex flex-col items-end gap-2">
-                        <span className={`px-3 py-1 rounded-full text-sm font-medium ${
-                          job.recommendation === 'apply' 
-                            ? 'bg-green-100 text-green-800'
-                            : job.recommendation === 'maybe'
-                            ? 'bg-yellow-100 text-yellow-800' 
-                            : 'bg-red-100 text-red-800'
-                        }`}>
-                          {job.recommendation.toUpperCase()}
-                        </span>
-                        
-                        {/* Scores */}
-                        <div className="text-xs text-gray-500 text-right">
-                          <div>Fit: {job.fitScore}/5</div>
-                          <div>Confidence: {job.confidence}/5</div>
-                        </div>
-                      </div>
-                    </div>
-                    
-                    {/* Job Summary */}
-                    {job.job_summary && (
-                      <div className="mb-4">
-                        <h4 className="text-sm font-medium text-gray-900 mb-1">Role Overview</h4>
-                        <p className="text-sm text-gray-700">{job.job_summary}</p>
-                      </div>
-                    )}
-                    
-                    {/* Fit Summary */}
-                    {job.fit_summary && (
-                      <div className="mb-4">
-                        <h4 className="text-sm font-medium text-gray-900 mb-1">Fit Assessment</h4>
-                        <p className="text-sm text-gray-700">{job.fit_summary}</p>
-                      </div>
-                    )}
-                    
-                    {/* Why Good Fit & Concerns */}
-                    <div className="grid md:grid-cols-2 gap-4">
-                      {/* Why Good Fit */}
-                      {job.why_good_fit && job.why_good_fit.length > 0 && (
-                        <div>
-                          <h4 className="text-sm font-medium text-green-800 mb-2 flex items-center">
-                            <span className="mr-1">✅</span>
-                            Why It's a Good Fit
-                          </h4>
-                          <ul className="space-y-1">
-                            {job.why_good_fit.map((reason, reasonIndex) => (
-                              <li key={reasonIndex} className="text-sm text-gray-700 flex items-start">
-                                <span className="text-green-600 mr-2 mt-0.5">•</span>
-                                {reason}
-                              </li>
-                            ))}
-                          </ul>
-                        </div>
-                      )}
-                      
-                      {/* Potential Concerns */}
-                      {job.potential_concerns && job.potential_concerns.length > 0 && (
-                        <div>
-                          <h4 className="text-sm font-medium text-amber-800 mb-2 flex items-center">
-                            <span className="mr-1">⚠️</span>
-                            Potential Concerns
-                          </h4>
-                          <ul className="space-y-1">
-                            {job.potential_concerns.map((concern, concernIndex) => (
-                              <li key={concernIndex} className="text-sm text-gray-700 flex items-start">
-                                <span className="text-amber-600 mr-2 mt-0.5">•</span>
-                                {concern}
-                              </li>
-                            ))}
-                          </ul>
-                        </div>
-                      )}
-                    </div>
-                    
-                    {/* Fallback to original summary if new fields aren't available */}
-                    {!job.job_summary && !job.fit_summary && job.summary && (
-                      <div className="mt-4">
-                        <p className="text-gray-700 text-sm">{job.summary}</p>
-                      </div>
-                    )}
-
-                    {/* Action Buttons */}
-                    <div className="mt-6 pt-4 border-t border-gray-100">
-                      <div className="flex flex-wrap gap-2">
-                        <button
-                          onClick={() => updateJobStatus(job.id, 'applied')}
-                          disabled={job.status === 'applied'}
-                          className={`px-3 py-1.5 rounded-md text-sm font-medium transition-all ${
-                            job.status === 'applied'
-                              ? 'bg-green-100 text-green-800 cursor-not-allowed'
-                              : 'bg-green-600 text-white hover:bg-green-700'
-                          }`}
-                        >
-                          {job.status === 'applied' ? '✓ Applied' : 'Mark as Applied'}
-                        </button>
-                        
-                        <button
-                          onClick={() => updateJobStatus(job.id, 'saved_for_later')}
-                          disabled={job.status === 'saved_for_later'}
-                          className={`px-3 py-1.5 rounded-md text-sm font-medium transition-all ${
-                            job.status === 'saved_for_later'
-                              ? 'bg-yellow-100 text-yellow-800 cursor-not-allowed'
-                              : 'bg-yellow-600 text-white hover:bg-yellow-700'
-                          }`}
-                        >
-                          {job.status === 'saved_for_later' ? '⭐ Saved' : 'Save for Later'}
-                        </button>
-                        
-                        <button
-                          onClick={() => updateJobStatus(job.id, 'not_interested')}
-                          disabled={job.status === 'not_interested'}
-                          className={`px-3 py-1.5 rounded-md text-sm font-medium transition-all ${
-                            job.status === 'not_interested'
-                              ? 'bg-gray-100 text-gray-600 cursor-not-allowed'
-                              : 'bg-gray-600 text-white hover:bg-gray-700'
-                          }`}
-                        >
-                          {job.status === 'not_interested' ? '✗ Not Interested' : 'Not Interested'}
-                        </button>
-
-                        {job.status !== 'unread' && (
-                          <button
-                            onClick={() => updateJobStatus(job.id, 'unread')}
-                            className="px-3 py-1.5 rounded-md text-sm font-medium bg-blue-100 text-blue-800 hover:bg-blue-200 transition-all"
-                          >
-                            Reset
-                          </button>
-                        )}
-                      </div>
-                    </div>
-                  </div>
+                {filteredJobs.map((job) => (
+                  <JobCard
+                    key={job.id}
+                    job={job}
+                    onUpdateStatus={updateJobStatus}
+                  />
                 ))}
               </div>
             </div>

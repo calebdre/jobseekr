@@ -13,8 +13,7 @@
 - [x] store search state so it can be relayed to users if they refresh the page
     + probably do this via database w/ user id
 
-- [ ] [INVESTIGATE] we probably don't need to send progress updates to the client in the stream route
-    
+
 - [ ] add error handling for common failures
     + show user-friendly error messages instead of browser alerts
     + add retry button when search fails
@@ -25,7 +24,7 @@
     + ability to cancel search in progress
 
 
-- [ ] add job actions
+- [x] add job actions
     + mark jobs as "applied", "not interested", "saved for later"
     + filter/sort results by recommendation, date, fit score
 
@@ -38,6 +37,12 @@
 - [ ] add logic to instead of fetching the first 10 results, a time period is specified and it fetches all results until that time period is reached
     + see @job-posting-dates-analysis.md for advice on fetching dates from google custom search
     + will need to add ability to paginate through results
+
+
+## Considerations
+- [ ] [INVESTIGATE] we probably don't need to send progress updates to the client in the stream route
+- [ ] need to figure out how to organize the filtering - can filter by: recommendation, date, fit score, and job actions taken (i.e. applied, not interested, etc.)
+
 
 ## Post-MVP
 - [ ] add a way to sign up for periodic email alerts
