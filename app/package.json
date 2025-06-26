@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@prisma/client": "^6.10.1",
+    "@supabase/supabase-js": "^2.50.2",
     "next": "15.3.4",
     "pdfjs-dist": "^5.3.31",
     "prisma": "^6.10.1",

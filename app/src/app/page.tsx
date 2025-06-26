@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
+import { useSearchSession } from "@/hooks/useSearchSession";
 
 export default function Home() {
   const [userId, setUserId] = useState<string>("");
@@ -33,6 +34,44 @@ export default function Home() {
     if (savedResume) setResumeText(savedResume);
     if (savedPreferences) setPreferences(savedPreferences);
     if (savedJobTitle) setJobTitle(savedJobTitle);
+
+    // Check for active search session and fetch existing jobs
+    const initializeData = async () => {
+      try {
+        // Check for active search session
+        const searchStatusResponse = await fetch(`/api/search/status?userId=${encodeURIComponent(storedUserId)}`);
+        if (searchStatusResponse.ok) {
+          const searchData = await searchStatusResponse.json();
+          if (searchData.hasActiveSearch) {
+            setActiveSearchSession(searchData.session);
+            setIsSearching(true);
+            setProgress({
+              current: searchData.session.progress.current,
+              total: searchData.session.progress.total,
+              status: searchData.session.progress.message
+            });
+            // Real-time subscription will be started automatically by the useSearchSession hook
+            console.log('Active search found, will start real-time subscription:', searchData.session);
+          }
+        }
+
+        // Fetch existing jobs
+        const jobsResponse = await fetch(`/api/jobs?userId=${encodeURIComponent(storedUserId)}`);
+        if (jobsResponse.ok) {
+          const jobsData = await jobsResponse.json();
+          if (jobsData.jobs && jobsData.jobs.length > 0) {
+            setJobResults(jobsData.jobs);
+            if (!searchData?.hasActiveSearch) {
+              setSearchComplete(true);
+            }
+          }
+        }
+      } catch (error) {
+        console.error('Error initializing data:', error);
+      }
+    };
+
+    initializeData();
   }, []);
 
   // Save resume to localStorage when it changes
@@ -51,6 +90,21 @@ export default function Home() {
   const handleJobTitleChange = (value: string) => {
     setJobTitle(value);
     localStorage.setItem('jobseekr_jobTitle', value);
+  };
+
+  // Function to refresh job results
+  const refreshJobResults = async () => {
+    if (!userId) return;
+    
+    try {
+      const response = await fetch(`/api/jobs?userId=${encodeURIComponent(userId)}`);
+      if (response.ok) {
+        const data = await response.json();
+        setJobResults(data.jobs || []);
+      }
+    } catch (error) {
+      console.error('Error refreshing job results:', error);
+    }
   };
 
   const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -92,6 +146,30 @@ export default function Home() {
   const [jobResults, setJobResults] = useState<any[]>([]);
   const [skippedJobs, setSkippedJobs] = useState<any[]>([]);
   const [searchComplete, setSearchComplete] = useState(false);
+  const [activeSearchSession, setActiveSearchSession] = useState<any>(null);
+
+  // Real-time search session subscription
+  const { cancelSubscription } = useSearchSession({
+    userId,
+    enabled: !!activeSearchSession && isSearching,
+    onProgressUpdate: (progress) => {
+      setProgress(progress);
+    },
+    onStatusChange: (status) => {
+      console.log('Search status changed to:', status);
+      if (status === 'completed') {
+        setIsSearching(false);
+        setSearchComplete(true);
+        setActiveSearchSession(null);
+        // Refresh job results
+        refreshJobResults();
+      } else if (status === 'failed') {
+        setIsSearching(false);
+        setActiveSearchSession(null);
+        alert('Search failed. Please try again.');
+      }
+    }
+  });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -103,6 +181,12 @@ export default function Home() {
     
     if (!jobTitle.trim()) {
       alert("Please enter a job title to search for");
+      return;
+    }
+
+    // Check if search is already in progress
+    if (isSearching || activeSearchSession) {
+      alert("Search already in progress. Please wait for it to complete.");
       return;
     }
 
@@ -196,6 +280,28 @@ export default function Home() {
       console.error('Error starting search:', error);
       setIsSearching(false);
       alert('Failed to start job search');
+    }
+  };
+
+  // Function to cancel active search
+  const handleCancelSearch = async () => {
+    if (!userId) return;
+    
+    try {
+      const response = await fetch(`/api/search/status?userId=${encodeURIComponent(userId)}`, {
+        method: 'DELETE'
+      });
+      
+      if (response.ok) {
+        setIsSearching(false);
+        setActiveSearchSession(null);
+        cancelSubscription();
+        setProgress({ current: 0, total: 0, status: 'Search cancelled' });
+        console.log('Search cancelled successfully');
+      }
+    } catch (error) {
+      console.error('Error cancelling search:', error);
+      alert('Failed to cancel search');
     }
   };
 
@@ -297,23 +403,47 @@ export default function Home() {
             </div>
 
             {/* Submit Button */}
-            <div className="flex justify-center">
+            <div className="flex justify-center gap-4">
               <button
                 type="submit"
-                disabled={isSearching}
+                disabled={isSearching || !!activeSearchSession}
                 className={`font-medium py-3 px-8 rounded-lg transition-colors duration-200 text-lg ${
-                  isSearching 
+                  isSearching || activeSearchSession
                     ? 'bg-gray-400 cursor-not-allowed text-gray-200' 
                     : 'bg-blue-600 hover:bg-blue-700 text-white'
                 }`}
               >
                 {isSearching ? 'Searching...' : 'Start Job Search'}
               </button>
+              
+              {(isSearching || activeSearchSession) && (
+                <button
+                  type="button"
+                  onClick={handleCancelSearch}
+                  className="font-medium py-3 px-6 rounded-lg bg-red-600 hover:bg-red-700 text-white transition-colors duration-200 text-lg"
+                >
+                  Cancel Search
+                </button>
+              )}
             </div>
           </form>
 
+          {/* Reconnection Message */}
+          {activeSearchSession && !isSearching && (
+            <div className="mt-8 bg-blue-50 border border-blue-200 rounded-lg p-6">
+              <h3 className="text-lg font-semibold text-blue-800 mb-2">Search in Progress</h3>
+              <p className="text-blue-700 mb-4">
+                You have an active search for "{activeSearchSession.jobTitle}" that started at{' '}
+                {new Date(activeSearchSession.createdAt).toLocaleTimeString()}.
+              </p>
+              <p className="text-blue-700 text-sm">
+                Real-time updates will appear below as the search progresses.
+              </p>
+            </div>
+          )}
+
           {/* Progress Section */}
-          {isSearching && (
+          {(isSearching || (activeSearchSession && progress.total > 0)) && (
             <div className="mt-8 bg-blue-50 rounded-lg p-6">
               <h2 className="text-xl font-semibold text-gray-900 mb-4">Job Search Progress</h2>
               
@@ -343,7 +473,7 @@ export default function Home() {
             <div className="mt-8">
               <h2 className="text-2xl font-bold text-gray-900 mb-6">Job Analysis Results</h2>
               
-              <div className="space-y-4">
+              <div className="space-y-6">
                 {jobResults.map((job, index) => (
                   <div key={job.id} className="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
                     <div className="flex justify-between items-start mb-4">
@@ -359,16 +489,28 @@ export default function Home() {
                           </a>
                         </h3>
                         <p className="text-gray-600 mb-2">{job.company}</p>
-                        {job.location && (
-                          <p className="text-sm text-gray-500 mb-2">{job.location}</p>
-                        )}
-                        {job.salary && (
-                          <p className="text-sm text-green-600 font-medium mb-2">{job.salary}</p>
+                        <div className="flex flex-wrap gap-4 text-sm text-gray-500 mb-3">
+                          {job.location && <span>📍 {job.location}</span>}
+                          {job.salary && <span className="text-green-600 font-medium">💰 {job.salary}</span>}
+                        </div>
+                        
+                        {/* Key Technologies */}
+                        {job.key_technologies && job.key_technologies.length > 0 && (
+                          <div className="flex flex-wrap gap-2 mb-3">
+                            {job.key_technologies.map((tech, techIndex) => (
+                              <span 
+                                key={techIndex}
+                                className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-md"
+                              >
+                                {tech}
+                              </span>
+                            ))}
+                          </div>
                         )}
                       </div>
                       
                       {/* Recommendation Badge */}
-                      <div className="ml-4">
+                      <div className="ml-4 flex flex-col items-end gap-2">
                         <span className={`px-3 py-1 rounded-full text-sm font-medium ${
                           job.recommendation === 'apply' 
                             ? 'bg-green-100 text-green-800'
@@ -378,23 +520,76 @@ export default function Home() {
                         }`}>
                           {job.recommendation.toUpperCase()}
                         </span>
+                        
+                        {/* Scores */}
+                        <div className="text-xs text-gray-500 text-right">
+                          <div>Fit: {job.fitScore}/5</div>
+                          <div>Confidence: {job.confidence}/5</div>
+                        </div>
                       </div>
                     </div>
                     
-                    {/* Scores */}
-                    <div className="flex space-x-6 mb-3">
-                      <div className="text-sm">
-                        <span className="text-gray-500">Fit Score: </span>
-                        <span className="font-medium">{job.fitScore}/5</span>
+                    {/* Job Summary */}
+                    {job.job_summary && (
+                      <div className="mb-4">
+                        <h4 className="text-sm font-medium text-gray-900 mb-1">Role Overview</h4>
+                        <p className="text-sm text-gray-700">{job.job_summary}</p>
                       </div>
-                      <div className="text-sm">
-                        <span className="text-gray-500">Confidence: </span>
-                        <span className="font-medium">{job.confidence}/5</span>
+                    )}
+                    
+                    {/* Fit Summary */}
+                    {job.fit_summary && (
+                      <div className="mb-4">
+                        <h4 className="text-sm font-medium text-gray-900 mb-1">Fit Assessment</h4>
+                        <p className="text-sm text-gray-700">{job.fit_summary}</p>
                       </div>
+                    )}
+                    
+                    {/* Why Good Fit & Concerns */}
+                    <div className="grid md:grid-cols-2 gap-4">
+                      {/* Why Good Fit */}
+                      {job.why_good_fit && job.why_good_fit.length > 0 && (
+                        <div>
+                          <h4 className="text-sm font-medium text-green-800 mb-2 flex items-center">
+                            <span className="mr-1">✅</span>
+                            Why It's a Good Fit
+                          </h4>
+                          <ul className="space-y-1">
+                            {job.why_good_fit.map((reason, reasonIndex) => (
+                              <li key={reasonIndex} className="text-sm text-gray-700 flex items-start">
+                                <span className="text-green-600 mr-2 mt-0.5">•</span>
+                                {reason}
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
+                      
+                      {/* Potential Concerns */}
+                      {job.potential_concerns && job.potential_concerns.length > 0 && (
+                        <div>
+                          <h4 className="text-sm font-medium text-amber-800 mb-2 flex items-center">
+                            <span className="mr-1">⚠️</span>
+                            Potential Concerns
+                          </h4>
+                          <ul className="space-y-1">
+                            {job.potential_concerns.map((concern, concernIndex) => (
+                              <li key={concernIndex} className="text-sm text-gray-700 flex items-start">
+                                <span className="text-amber-600 mr-2 mt-0.5">•</span>
+                                {concern}
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
                     </div>
                     
-                    {/* Summary */}
-                    <p className="text-gray-700 text-sm">{job.summary}</p>
+                    {/* Fallback to original summary if new fields aren't available */}
+                    {!job.job_summary && !job.fit_summary && job.summary && (
+                      <div className="mt-4">
+                        <p className="text-gray-700 text-sm">{job.summary}</p>
+                      </div>
+                    )}
                   </div>
                 ))}
               </div>

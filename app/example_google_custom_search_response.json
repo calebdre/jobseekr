@@ -1,0 +1,422 @@
+{
+    "kind": "customsearch#search",
+    "url": {
+      "type": "application/json",
+      "template": "https://www.googleapis.com/customsearch/v1?q={searchTerms}&num={count?}&start={startIndex?}&lr={language?}&safe={safe?}&cx={cx?}&sort={sort?}&filter={filter?}&gl={gl?}&cr={cr?}&googlehost={googleHost?}&c2coff={disableCnTwTranslation?}&hq={hq?}&hl={hl?}&siteSearch={siteSearch?}&siteSearchFilter={siteSearchFilter?}&exactTerms={exactTerms?}&excludeTerms={excludeTerms?}&linkSite={linkSite?}&orTerms={orTerms?}&dateRestrict={dateRestrict?}&lowRange={lowRange?}&highRange={highRange?}&searchType={searchType}&fileType={fileType?}&rights={rights?}&imgSize={imgSize?}&imgType={imgType?}&imgColorType={imgColorType?}&imgDominantColor={imgDominantColor?}&alt=json"
+    },
+    "queries": {
+      "request": [
+        {
+          "title": "Google Custom Search - software engineer \"remote\"",
+          "totalResults": "242",
+          "searchTerms": "software engineer \"remote\"",
+          "count": 10,
+          "startIndex": 1,
+          "inputEncoding": "utf8",
+          "outputEncoding": "utf8",
+          "safe": "off",
+          "cx": "04e65784d460647ab",
+          "sort": "date",
+          "dateRestrict": "d1"
+        }
+      ],
+      "nextPage": [
+        {
+          "title": "Google Custom Search - software engineer \"remote\"",
+          "totalResults": "242",
+          "searchTerms": "software engineer \"remote\"",
+          "count": 10,
+          "startIndex": 11,
+          "inputEncoding": "utf8",
+          "outputEncoding": "utf8",
+          "safe": "off",
+          "cx": "04e65784d460647ab",
+          "sort": "date",
+          "dateRestrict": "d1"
+        }
+      ]
+    },
+    "context": {
+      "title": "job search"
+    },
+    "searchInformation": {
+      "searchTime": 0.138937,
+      "formattedSearchTime": "0.14",
+      "totalResults": "242",
+      "formattedTotalResults": "242"
+    },
+    "items": [
+      {
+        "kind": "customsearch#result",
+        "title": "Job Application for Director, Channel Sales at Nebius",
+        "htmlTitle": "Job Application for Director, Channel Sales at Nebius",
+        "link": "https://boards.greenhouse.io/nebius/jobs/4601017101",
+        "displayLink": "boards.greenhouse.io",
+        "snippet": "19 hours ago ... Director, Channel Sales. Remote; United States. Apply. Why work at Nebius Nebius is leading a ...",
+        "htmlSnippet": "19 hours ago <b>...</b> Director, Channel Sales. <b>Remote</b>; United States. Apply. Why work at Nebius Nebius is leading a&nbsp;...",
+        "formattedUrl": "https://boards.greenhouse.io/nebius/jobs/4601017101",
+        "htmlFormattedUrl": "https://boards.greenhouse.io/nebius/jobs/4601017101",
+        "pagemap": {
+          "cse_thumbnail": [
+            {
+              "src": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ8OlKI-3QzJ6UdvjzoJVYxJEVIrTTs5CpVLEtPvP2POYQpktv1ldJZLx0&s",
+              "width": "225",
+              "height": "225"
+            }
+          ],
+          "metatags": [
+            {
+              "og:image": "https://s101-recruiting.cdn.greenhouse.io/external_greenhouse_job_boards/logos/400/249/610/original/512_1.png?1750457198",
+              "og:type": "article",
+              "viewport": "width=device-width,initial-scale=1",
+              "og:title": "Director, Channel Sales",
+              "og:url": "https://boards.eu.greenhouse.io/nebius/jobs/4601017101?gh_jid=4601017101",
+              "og:description": "Remote; United States"
+            }
+          ],
+          "cse_image": [
+            {
+              "src": "https://s101-recruiting.cdn.greenhouse.io/external_greenhouse_job_boards/logos/400/249/610/original/512_1.png?1750457198"
+            }
+          ]
+        }
+      },
+      {
+        "kind": "customsearch#result",
+        "title": "Software Engineer: Data - Fiscal.ai",
+        "htmlTitle": "<b>Software Engineer</b>: Data - Fiscal.ai",
+        "link": "https://apply.workable.com/fiscal-ai/j/FFA178A2CB",
+        "displayLink": "apply.workable.com",
+        "snippet": "19 hours ago ... Benefits. Competetive salary; Equity options; Unlimited vacation; Benefits (dental, massage, prescriptions, vision, etc.) Remote-first ...",
+        "htmlSnippet": "19 hours ago <b>...</b> Benefits. Competetive salary; Equity options; Unlimited vacation; Benefits (dental, massage, prescriptions, vision, etc.) <b>Remote</b>-first&nbsp;...",
+        "formattedUrl": "https://apply.workable.com/fiscal-ai/j/FFA178A2CB",
+        "htmlFormattedUrl": "https://apply.workable.com/fiscal-ai/j/FFA178A2CB",
+        "pagemap": {
+          "cse_thumbnail": [
+            {
+              "src": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ2YQJINtJRI7Xvu-K6hWmLHibSe9ZR9pnBoECraQWEvg4RYAxzySVCRbqy&s",
+              "width": "310",
+              "height": "163"
+            }
+          ],
+          "metatags": [
+            {
+              "og:image": "https://workablehr.s3.amazonaws.com/uploads/account/open_graph_logo/674170/social?1750686501000",
+              "theme-color": "#000000",
+              "og:type": "website",
+              "og:title": "Software Engineer: Data - Fiscal.ai",
+              "msapplication-tileimage": "https://www.workable.com/static/ms-icon-144x144.png",
+              "version": "v7.220.0",
+              "og:description": "Fiscal.ai (formerly) FinChat is on journey to build the best financial data company in the era of AI. From humble bootstrapped beginnings, we are now a venture-backed growth story amassing 300,000+ users and a growing number of noteworthy enterprise pa...",
+              "viewport": "width=device-width,initial-scale=1,maximum-scale=1,shrink-to-fit=no",
+              "domain": "workable.com",
+              "subdomain": "fiscal-ai",
+              "og:url": "https://apply.workable.com/fiscal-ai/j/FFA178A2CB",
+              "job": "4961835",
+              "account": "e603b86a-cf21-434d-aab7-3b8b808450d5"
+            }
+          ],
+          "cse_image": [
+            {
+              "src": "https://workablehr.s3.amazonaws.com/uploads/account/open_graph_logo/674170/social?1750686501000"
+            }
+          ]
+        }
+      },
+      {
+        "kind": "customsearch#result",
+        "title": "CSC Generation - Senior Frontend Engineer",
+        "htmlTitle": "CSC Generation - Senior Frontend <b>Engineer</b>",
+        "link": "https://jobs.lever.co/cscgeneration-2/d7367873-0581-49fc-8ab1-8f789d4d4162",
+        "displayLink": "jobs.lever.co",
+        "snippet": "19 hours ago ... Senior Frontend Engineer. Remote. CSC GENERATION (Shared Services- India) ... As a Senior Software Engineer (Front End), you will enjoy working across the ...",
+        "htmlSnippet": "19 hours ago <b>...</b> Senior Frontend Engineer. <b>Remote</b>. CSC GENERATION (Shared Services- India) ... As a Senior <b>Software Engineer</b> (Front End), you will enjoy working across the&nbsp;...",
+        "formattedUrl": "https://jobs.lever.co/...2/d7367873-0581-49fc-8ab1-8f789d4d4162",
+        "htmlFormattedUrl": "https://jobs.lever.co/...2/d7367873-0581-49fc-8ab1-8f789d4d4162",
+        "pagemap": {
+          "cse_thumbnail": [
+            {
+              "src": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTjwg2yKtkw51eWIoii7udd6iNoOyjK6iV4VC-AlgtuwIGQeIXm_vf2ng&s",
+              "width": "415",
+              "height": "121"
+            }
+          ],
+          "metatags": [
+            {
+              "og:image": "https://lever-client-logos.s3.us-west-2.amazonaws.com/a2399369-889f-4200-a5ce-1ed0156b7f57-1655336701155.png",
+              "twitter:title": "CSC Generation - Senior Frontend Engineer",
+              "og:image:width": "1200",
+              "viewport": "width=device-width, initial-scale=1",
+              "twitter:description": "CSC Generation Enterprise (CSC) is an AI-enabled multi-brand platform that acquires and transforms retailers into profitable, digital-first, consumer-centric businesses. CSC's retail platform is purpose built around its core M&A strategy and drives alpha by encoding revenue growth, unit margin management, and other expert-level retail practices into automation and AI. CSC owns and operates more than 10 retail, eCommerce, and wholesale brands, including Sur La Table, Backcountry, and One Kings Lane. You will be working directly with the Engineers that built our key products from the ground up used by many different projects that will help bring our company to the next level. As a Senior Software Engineer (Front End), you will enjoy working across the software stack to design, develop, and deploy engaging experiences for the web. You are empowered by CSC IQ to get to your next career stage! Tech Stack: React, Typescript, AWS Platforms: Web",
+              "og:title": "CSC Generation - Senior Frontend Engineer",
+              "og:image:height": "630",
+              "og:url": "https://jobs.lever.co/cscgeneration-2/d7367873-0581-49fc-8ab1-8f789d4d4162",
+              "og:description": "CSC Generation Enterprise (CSC) is an AI-enabled multi-brand platform that acquires and transforms retailers into profitable, digital-first, consumer-centric businesses. CSC's retail platform is purpose built around its core M&A strategy and drives alpha by encoding revenue growth, unit margin management, and other expert-level retail practices into automation and AI. CSC owns and operates more than 10 retail, eCommerce, and wholesale brands, including Sur La Table, Backcountry, and One Kings Lane. You will be working directly with the Engineers that built our key products from the ground up used by many different projects that will help bring our company to the next level. As a Senior Software Engineer (Front End), you will enjoy working across the software stack to design, develop, and deploy engaging experiences for the web. You are empowered by CSC IQ to get to your next career stage! Tech Stack: React, Typescript, AWS Platforms: Web",
+              "twitter:image": "https://lever-client-logos.s3.us-west-2.amazonaws.com/a2399369-889f-4200-a5ce-1ed0156b7f57-1655336656465.png"
+            }
+          ],
+          "cse_image": [
+            {
+              "src": "https://lever-client-logos.s3.us-west-2.amazonaws.com/a2399369-889f-4200-a5ce-1ed0156b7f57-1655336701155.png"
+            }
+          ]
+        }
+      },
+      {
+        "kind": "customsearch#result",
+        "title": "Job Application for Technical Manager – E2E (Satellite to Cellular ...",
+        "htmlTitle": "Job Application for Technical Manager – E2E (Satellite to Cellular ...",
+        "link": "https://boards.greenhouse.io/embed/job_app?for=astspacemobile&token=4576808005",
+        "displayLink": "boards.greenhouse.io",
+        "snippet": "19 hours ago ... Excel (pivot/KPIs) - detailed trend and variance analysis. SecureCRT, AnyDesk, RemoteIQ - remote lab and field session access. AST SpaceMobile is an Equal ...",
+        "htmlSnippet": "19 hours ago <b>...</b> Excel (pivot/KPIs) - detailed trend and variance analysis. SecureCRT, AnyDesk, RemoteIQ - <b>remote</b> lab and field session access. AST SpaceMobile is an Equal&nbsp;...",
+        "formattedUrl": "https://boards.greenhouse.io/embed/job_app?for=astspacemobile&token...",
+        "htmlFormattedUrl": "https://boards.greenhouse.io/embed/job_app?for=astspacemobile&amp;token...",
+        "pagemap": {
+          "cse_thumbnail": [
+            {
+              "src": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQv6tqANPOu2z5oplnGm1LozT99RKFWrDOC-4fVFbrqfw3MHGyVJA-ULSU&s",
+              "width": "225",
+              "height": "225"
+            }
+          ],
+          "metatags": [
+            {
+              "og:type": "article",
+              "gh:type": "embedded",
+              "viewport": "width=device-width, minimum-scale=1.0",
+              "og:title": "Technical Manager – E2E (Satellite to Cellular Networks)",
+              "og:url": "https://boards.greenhouse.io/astspacemobile/jobs/4576808005",
+              "og:description": "Miami, Florida, United States"
+            }
+          ],
+          "cse_image": [
+            {
+              "src": "https://boards.cdn.greenhouse.io/assets/svg/close-2388e0f798509ffdefd9fe48321955a399f62a302d4f33f96e798f2272a7b52d.svg"
+            }
+          ]
+        }
+      },
+      {
+        "kind": "customsearch#result",
+        "title": "Senior Customer Success Manager, Enterprise (New England ...",
+        "htmlTitle": "Senior Customer Success Manager, Enterprise (New England ...",
+        "link": "https://boards.greenhouse.io/abnormalsecurity/jobs/6608653003",
+        "displayLink": "boards.greenhouse.io",
+        "snippet": "19 hours ago ... Software Engineer. Read More. Christy Min. Sales Development ... Operating as a globally-distributed, majority remote company means we get to ...",
+        "htmlSnippet": "19 hours ago <b>...</b> <b>Software Engineer</b>. Read More. Christy Min. Sales Development ... Operating as a globally-distributed, majority <b>remote</b> company means we get to&nbsp;...",
+        "formattedUrl": "https://boards.greenhouse.io/abnormalsecurity/jobs/6608653003",
+        "htmlFormattedUrl": "https://boards.greenhouse.io/abnormalsecurity/jobs/6608653003",
+        "pagemap": {
+          "cse_thumbnail": [
+            {
+              "src": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTzNrjXxXmU3GQzGSRPZ23_AEoc0P--4AjfjbRjgLIBeDZOd86R0X2xG56C&s",
+              "width": "311",
+              "height": "162"
+            }
+          ],
+          "metatags": [
+            {
+              "og:image": "https://site-assets.plasmic.app/494060ff944b45ccd86bc693e71b6df9.png",
+              "next-head-count": "9",
+              "twitter:card": "summary",
+              "twitter:title": "Senior Customer Success Manager, Enterprise (New England) | Abnormal",
+              "viewport": "width=device-width",
+              "og:title": "Senior Customer Success Manager, Enterprise (New England) | Abnormal",
+              "twitter:image": "https://site-assets.plasmic.app/494060ff944b45ccd86bc693e71b6df9.png"
+            }
+          ],
+          "cse_image": [
+            {
+              "src": "https://site-assets.plasmic.app/494060ff944b45ccd86bc693e71b6df9.png"
+            }
+          ]
+        }
+      },
+      {
+        "kind": "customsearch#result",
+        "title": "Job Application for Firmware Engineer at Shift5",
+        "htmlTitle": "Job Application for Firmware <b>Engineer</b> at Shift5",
+        "link": "https://job-boards.greenhouse.io/shift5/jobs/5571010004",
+        "displayLink": "job-boards.greenhouse.io",
+        "snippet": "19 hours ago ... Degree in Computer Science, Computer Engineering, Electrical Engineering, or a related field. ... Flexible work & remote work policy; Tax-deferred public transit ...",
+        "htmlSnippet": "19 hours ago <b>...</b> Degree in Computer Science, <b>Computer Engineering</b>, Electrical Engineering, or a related field. ... Flexible work &amp; <b>remote</b> work policy; Tax-deferred public transit&nbsp;...",
+        "formattedUrl": "https://job-boards.greenhouse.io/shift5/jobs/5571010004",
+        "htmlFormattedUrl": "https://job-boards.greenhouse.io/shift5/jobs/5571010004",
+        "pagemap": {
+          "cse_thumbnail": [
+            {
+              "src": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR6ZxfTCnBFSVpB-zFuCg8hyOKTxsx8wx5DzVwHl9_O3-N1YDmutUXuVw&s",
+              "width": "311",
+              "height": "162"
+            }
+          ],
+          "metatags": [
+            {
+              "og:image": "https://s4-recruiting.cdn.greenhouse.io/external_greenhouse_job_boards/logos/400/318/200/original/Greenhouse_logo_new.png?1670852420",
+              "og:type": "article",
+              "viewport": "width=device-width,initial-scale=1",
+              "og:title": "Firmware Engineer",
+              "og:url": "https://job-boards.greenhouse.io/shift5/jobs/5571010004",
+              "og:description": "Rosslyn, VA"
+            }
+          ],
+          "cse_image": [
+            {
+              "src": "https://s4-recruiting.cdn.greenhouse.io/external_greenhouse_job_boards/logos/400/318/200/original/Greenhouse_logo_new.png?1670852420"
+            }
+          ]
+        }
+      },
+      {
+        "kind": "customsearch#result",
+        "title": "Android Software Engineer | Atcom S.A. | Jobs By Workable",
+        "htmlTitle": "Android <b>Software Engineer</b> | Atcom S.A. | Jobs By Workable",
+        "link": "https://jobs.workable.com/view/mBY6YDoNo8kXFCQA872LZK/remote-android-software-engineer-in-athens-at-atcom-s.a",
+        "displayLink": "jobs.workable.com",
+        "snippet": "19 hours ago ... Android Software Engineer. at Atcom S.A.. RemoteAthens, Attica, GreeceMobileFull-time. Posted few hours ago. Share job. Apply now. Description. ATCOM is the ...",
+        "htmlSnippet": "19 hours ago <b>...</b> Android <b>Software Engineer</b>. at Atcom S.A.. <b>Remote</b>Athens, Attica, GreeceMobileFull-time. Posted few hours ago. Share job. Apply now. Description. ATCOM is the&nbsp;...",
+        "formattedUrl": "https://jobs.workable.com/.../remote-android-software-engineer-in-athens-at...",
+        "htmlFormattedUrl": "https://jobs.workable.com/.../<b>remote</b>-android-<b>software</b>-<b>engineer</b>-in-athens-at...",
+        "pagemap": {
+          "cse_thumbnail": [
+            {
+              "src": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTtSWXtGyKeCy3sBD03wDbYKpn-ktiZm1tSXCAB767YoYm4kB9uUYwJ9OlP&s",
+              "width": "310",
+              "height": "163"
+            }
+          ],
+          "metatags": [
+            {
+              "og:image": "https://workablehr-ui.s3.amazonaws.com/job-board/assets/social-share-image.png",
+              "og:type": "website",
+              "twitter:card": "summary_large_image",
+              "twitter:title": "Android Software Engineer | Atcom S.A. | Jobs By Workable",
+              "theme-color": "#004561",
+              "og:title": "Android Software Engineer | Atcom S.A. | Jobs By Workable",
+              "apple-mobile-web-app-title": "Jobs by Workable",
+              "msapplication-tileimage": "https://workablehr-ui.s3.amazonaws.com/job-board/assets/ms-icon-144x144.png",
+              "version": "v7.220.0",
+              "og:description": "ATCOM is the leading digital business agency in Greece and handles a selection of significant digital projects and solutions in Greece in a variety of sectors, such as Β2C &amp; B2B commerce, finance, telco, travel, news portals, intranets or other...",
+              "twitter:image": "https://workablehr-ui.s3.amazonaws.com/job-board/assets/social-share-image.png",
+              "twitter:site": "@workable",
+              "apple-mobile-web-app-status-bar-style": "default",
+              "viewport": "width=device-width,initial-scale=1,maximum-scale=1,shrink-to-fit=no",
+              "twitter:description": "ATCOM is the leading digital business agency in Greece and handles a selection of significant digital projects and solutions in Greece in a variety of sectors, such as Β2C &amp; B2B commerce, finance, telco, travel, news portals, intranets or other...",
+              "apple-mobile-web-app-capable": "yes",
+              "og:url": "https://jobs.workable.com/view/mBY6YDoNo8kXFCQA872LZK/remote-android-software-engineer-in-athens-at-atcom-s.a."
+            }
+          ],
+          "cse_image": [
+            {
+              "src": "https://workablehr-ui.s3.amazonaws.com/job-board/assets/social-share-image.png"
+            }
+          ]
+        }
+      },
+      {
+        "kind": "customsearch#result",
+        "title": "Job Application for Art Director (UI/UX) - NBA 2K at 2K",
+        "htmlTitle": "Job Application for Art Director (UI/UX) - NBA 2K at 2K",
+        "link": "https://job-boards.greenhouse.io/2k/jobs/6613794003",
+        "displayLink": "job-boards.greenhouse.io",
+        "snippet": "19 hours ago ... Experience working in 3D with motion including Maya, Cinema 4D, Element 3D, or other industry standard software ... This is a fully remote role that may be based ...",
+        "htmlSnippet": "19 hours ago <b>...</b> Experience working in 3D with motion including Maya, Cinema 4D, Element 3D, or other industry standard <b>software</b> ... This is a fully <b>remote</b> role that may be based&nbsp;...",
+        "formattedUrl": "https://job-boards.greenhouse.io/2k/jobs/6613794003",
+        "htmlFormattedUrl": "https://job-boards.greenhouse.io/2k/jobs/6613794003",
+        "pagemap": {
+          "cse_thumbnail": [
+            {
+              "src": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRyK7r3sIhFF1J66dqvvPrT8QdjdnIRjrOSxNc34AQQu8tKevI_Je3S&s",
+              "width": "64",
+              "height": "64"
+            }
+          ],
+          "metatags": [
+            {
+              "og:image": "https://s3-recruiting.cdn.greenhouse.io/external_greenhouse_job_boards/logos/400/269/700/original/2K_Logo_Red_solid.png?1742487450",
+              "og:type": "article",
+              "viewport": "width=device-width,initial-scale=1",
+              "og:title": "Art Director (UI/UX) - NBA 2K",
+              "og:url": "https://job-boards.greenhouse.io/2k/jobs/6613794003",
+              "og:description": "Novato, California, United States"
+            }
+          ],
+          "cse_image": [
+            {
+              "src": "https://s3-recruiting.cdn.greenhouse.io/external_greenhouse_job_boards/logos/400/269/700/original/2K_Logo_Red_solid.png?1742487450"
+            }
+          ]
+        }
+      },
+      {
+        "kind": "customsearch#result",
+        "title": "Job Application for Backend Engineer (Remote) at Clarifai",
+        "htmlTitle": "Job Application for Backend <b>Engineer</b> (<b>Remote</b>) at Clarifai",
+        "link": "https://job-boards.greenhouse.io/clarifai/jobs/7006794?gh_jid=7006794",
+        "displayLink": "job-boards.greenhouse.io",
+        "snippet": "19 hours ago ... Backend Engineer (Remote). India. Apply. About the Company: Clarifai is a leading, full-lifecycle deep learning AI platform for computer vision, natural ...",
+        "htmlSnippet": "19 hours ago <b>...</b> Backend <b>Engineer</b> (<b>Remote</b>). India. Apply. About the Company: Clarifai is a leading, full-lifecycle deep learning AI platform for <b>computer</b> vision, natural&nbsp;...",
+        "formattedUrl": "https://job-boards.greenhouse.io/clarifai/jobs/7006794?gh_jid=7006794",
+        "htmlFormattedUrl": "https://job-boards.greenhouse.io/clarifai/jobs/7006794?gh_jid=7006794",
+        "pagemap": {
+          "cse_thumbnail": [
+            {
+              "src": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQO4SbrPWIkgPrWwsX3-W8tI-C_fh9612xjmIO9m217KYJBFPLNLtr5TE0o&s",
+              "width": "310",
+              "height": "163"
+            }
+          ],
+          "metatags": [
+            {
+              "og:image": "https://recruiting.cdn.greenhouse.io/external_greenhouse_job_boards/logos/000/001/290/original/Clarifai_Logo_1200x630px_landscapeIcon.png?1565298425",
+              "og:type": "article",
+              "viewport": "width=device-width,initial-scale=1",
+              "og:title": "Backend Engineer (Remote)",
+              "og:url": "https://boards.greenhouse.io/clarifai/jobs/7006794?gh_jid=7006794",
+              "og:description": "India"
+            }
+          ],
+          "cse_image": [
+            {
+              "src": "https://recruiting.cdn.greenhouse.io/external_greenhouse_job_boards/logos/000/001/290/original/Clarifai_Logo_1200x630px_landscapeIcon.png?1565298425"
+            }
+          ]
+        }
+      },
+      {
+        "kind": "customsearch#result",
+        "title": "Open Role",
+        "htmlTitle": "Open Role",
+        "link": "https://boards.greenhouse.io/modemobile/jobs/8049263002",
+        "displayLink": "boards.greenhouse.io",
+        "snippet": "19 hours ago ... Web App Developer (Remote). Remote. Apply. Who We Are (Mode Mobile). Mode Mobile is the creator of EarnOS, a transformational software that turns ordinary ...",
+        "htmlSnippet": "19 hours ago <b>...</b> Web App Developer (<b>Remote</b>). <b>Remote</b>. Apply. Who We Are (Mode Mobile). Mode Mobile is the creator of EarnOS, a transformational <b>software</b> that turns ordinary&nbsp;...",
+        "formattedUrl": "https://boards.greenhouse.io/modemobile/jobs/8049263002",
+        "htmlFormattedUrl": "https://boards.greenhouse.io/modemobile/jobs/8049263002",
+        "pagemap": {
+          "cse_thumbnail": [
+            {
+              "src": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRjRMAQjSSmzxxcejAPCJXd6WX7XbsG-KRhRV0wwtrCVv-YGKBiYX3tPskT&s",
+              "width": "310",
+              "height": "163"
+            }
+          ],
+          "metatags": [
+            {
+              "og:image": "https://cdn.prod.website-files.com/61c25b8fda22538c7d02b8ae/61fb1d0c1423fc4cc6366812_modemobile-open-graph-5.jpg",
+              "twitter:title": "Open Role",
+              "viewport": "width=device-width, initial-scale=1",
+              "og:title": "Open Role",
+              "twitter:image": "https://cdn.prod.website-files.com/61c25b8fda22538c7d02b8ae/61fb1d0c1423fc4cc6366812_modemobile-open-graph-5.jpg"
+            }
+          ],
+          "cse_image": [
+            {
+              "src": "https://cdn.prod.website-files.com/61c25b8fda22538c7d02b8ae/61fb1d0c1423fc4cc6366812_modemobile-open-graph-5.jpg"
+            }
+          ]
+        }
+      }
+    ]
+  }
