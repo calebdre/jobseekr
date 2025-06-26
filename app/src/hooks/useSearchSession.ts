@@ -18,6 +18,8 @@ export function useSearchSession({ userId, onProgressUpdate, onStatusChange, ena
     }
 
     console.log('Setting up real-time subscription for user:', userId);
+    console.log('Subscription enabled:', enabled);
+    console.log('Current activeSearchSession state when subscribing');
 
     // Create a channel for this user's search sessions
     const channel = supabase
@@ -52,8 +54,14 @@ export function useSearchSession({ userId, onProgressUpdate, onStatusChange, ena
           }
         }
       )
-      .subscribe((status) => {
+      .subscribe((status, err) => {
         console.log('Subscription status:', status);
+        if (err) {
+          console.error('Subscription error:', err);
+        }
+        if (status === 'SUBSCRIBED') {
+          console.log('Successfully subscribed to SearchSession updates for user:', userId);
+        }
       });
 
     channelRef.current = channel;
