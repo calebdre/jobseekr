@@ -1,24 +1,5 @@
 import Together from "together-ai";
-
-interface JobSummary {
-  role: string;
-  company: string;
-  location: string;
-  salary_range: string;
-  key_technologies: string[];
-}
-
-interface JobAnalysis {
-  recommendation: 'apply' | 'maybe' | 'skip';
-  fitScore: number; // 1-5
-  confidence: number; // 1-5
-  job_summary: string;
-  fit_summary: string;
-  why_good_fit: string[];
-  potential_concerns: string[];
-  summary: JobSummary;
-  analysis: string; // Keep for backward compatibility
-}
+import { JobAnalysis } from '@/types';
 
 export async function analyzeJobFit(
   jobContent: string, 

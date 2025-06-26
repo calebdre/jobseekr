@@ -1,7 +1,4 @@
-interface JobCardProps {
-  job: any;
-  onUpdateStatus: (jobId: string, status: string) => void;
-}
+import { JobCardProps } from '@/types';
 
 export default function JobCard({ job, onUpdateStatus }: JobCardProps) {
   return (

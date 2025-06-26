@@ -1,13 +1,7 @@
 import { useEffect, useRef } from 'react';
-import { supabase, SearchSessionUpdate } from '@/lib/supabase';
+import { supabase } from '@/lib/supabase';
 import { RealtimeChannel } from '@supabase/supabase-js';
-
-interface UseSearchSessionProps {
-  userId: string;
-  onProgressUpdate: (progress: { current: number; total: number; status: string }) => void;
-  onStatusChange: (status: string) => void;
-  enabled: boolean;
-}
+import { UseSearchSessionProps, SearchSessionUpdate } from '@/types';
 
 export function useSearchSession({ userId, onProgressUpdate, onStatusChange, enabled }: UseSearchSessionProps) {
   const channelRef = useRef<RealtimeChannel | null>(null);

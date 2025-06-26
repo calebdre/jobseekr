@@ -1,41 +1,12 @@
 import { useState, useRef } from 'react';
+import { UseJobSearchProps, UseJobSearchReturn, SearchProgress, SkippedJob, SearchSession } from '@/types';
 
-interface SearchProgress {
-  current: number;
-  total: number;
-  status: string;
-}
-
-interface UseJobSearchProps {
-  userId: string;
-  onSearchComplete: () => void;
-  onJobResult: (job: any) => void;
-  onJobSkipped: (job: any) => void;
-}
-
-interface UseJobSearchReturn {
-  isSearching: boolean;
-  progress: SearchProgress;
-  skippedJobs: any[];
-  searchComplete: boolean;
-  activeSearchSession: any;
-  setIsSearching: (searching: boolean) => void;
-  setProgress: (progress: SearchProgress) => void;
-  setSearchComplete: (complete: boolean) => void;
-  setActiveSearchSession: (session: any) => void;
-  setSkippedJobs: (jobs: any[]) => void;
-  handleSubmit: (resumeText: string, preferences: string, jobTitle: string) => Promise<void>;
-  handleCancelSearch: () => Promise<void>;
-  handleFileUpload: (event: React.ChangeEvent<HTMLInputElement>, onResumeChange: (text: string) => void) => Promise<void>;
-  fileInputRef: React.RefObject<HTMLInputElement>;
-}
-
-export function useJobSearch({ userId, onSearchComplete, onJobResult, onJobSkipped }: UseJobSearchProps): UseJobSearchReturn {
+export function useJobSearch({ userId, onSearchComplete, onJobResult }: UseJobSearchProps): UseJobSearchReturn {
   const [isSearching, setIsSearching] = useState(false);
   const [progress, setProgress] = useState<SearchProgress>({ current: 0, total: 0, status: '' });
-  const [skippedJobs, setSkippedJobs] = useState<any[]>([]);
+  const [skippedJobs, setSkippedJobs] = useState<SkippedJob[]>([]);
   const [searchComplete, setSearchComplete] = useState(false);
-  const [activeSearchSession, setActiveSearchSession] = useState<any>(null);
+  const [activeSearchSession, setActiveSearchSession] = useState<SearchSession | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>, onResumeChange: (text: string) => void) => {
@@ -61,7 +32,10 @@ export function useJobSearch({ userId, onSearchComplete, onJobResult, onJobSkipp
       for (let i = 1; i <= pdf.numPages; i++) {
         const page = await pdf.getPage(i);
         const textContent = await page.getTextContent();
-        text += textContent.items.map((item: any) => item.str).join(" ") + "\n";
+        text += textContent.items
+          .map(item => 'str' in item ? item.str : '')
+          .filter(Boolean)
+          .join(" ") + "\n";
       }
       
       onResumeChange(text);

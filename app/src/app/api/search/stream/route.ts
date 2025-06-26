@@ -12,7 +12,12 @@ async function updateSearchProgress(
   progress: { current: number; total: number; message: string }, 
   status?: string
 ) {
-  const updateData: any = {
+  const updateData: {
+    progress: { current: number; total: number; message: string };
+    updatedAt: Date;
+    status?: string;
+    completedAt?: Date;
+  } = {
     progress,
     updatedAt: new Date()
   };
@@ -37,7 +42,7 @@ export async function POST(request: NextRequest) {
   
   const stream = new ReadableStream({
     async start(controller) {
-      let searchSession: any = null;
+      let searchSession: { id: string } | null = null;
       try {
         // Parse request body
         const { userId, resume, preferences, jobTitle } = await request.json();

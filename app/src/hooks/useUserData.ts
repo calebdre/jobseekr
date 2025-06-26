@@ -1,20 +1,5 @@
 import { useState, useEffect } from 'react';
-
-interface UserData {
-  userId: string;
-  resumeText: string;
-  preferences: string;
-  jobTitle: string;
-}
-
-interface UseUserDataReturn extends UserData {
-  setResumeText: (value: string) => void;
-  setPreferences: (value: string) => void;
-  setJobTitle: (value: string) => void;
-  handleResumeChange: (value: string) => void;
-  handlePreferencesChange: (value: string) => void;
-  handleJobTitleChange: (value: string) => void;
-}
+import { UseUserDataReturn } from '@/types';
 
 export function useUserData(): UseUserDataReturn {
   const [userId, setUserId] = useState<string>('');

@@ -1,4 +1,4 @@
-import { GoogleSearchItem } from '../services/search';
+import { GoogleSearchItem } from '@/types/search.types';
 
 export interface JobData {
   title: string;
