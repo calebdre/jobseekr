@@ -38,13 +38,18 @@ export default function Home() {
     // Check for active search session and fetch existing jobs
     const initializeData = async () => {
       try {
+        let searchData = null;
+        
         // Check for active search session
         const searchStatusResponse = await fetch(`/api/search/status?userId=${encodeURIComponent(storedUserId)}`);
         if (searchStatusResponse.ok) {
-          const searchData = await searchStatusResponse.json();
+          searchData = await searchStatusResponse.json();
           if (searchData.hasActiveSearch) {
             setActiveSearchSession(searchData.session);
-            setIsSearching(true);
+            // Only set isSearching to true if search is actually in progress
+            if (searchData.session.status === 'in_progress') {
+              setIsSearching(true);
+            }
             setProgress({
               current: searchData.session.progress.current,
               total: searchData.session.progress.total,
@@ -147,11 +152,12 @@ export default function Home() {
   const [skippedJobs, setSkippedJobs] = useState<any[]>([]);
   const [searchComplete, setSearchComplete] = useState(false);
   const [activeSearchSession, setActiveSearchSession] = useState<any>(null);
+  const [statusFilter, setStatusFilter] = useState<string>('all');
 
   // Real-time search session subscription
   const { cancelSubscription } = useSearchSession({
     userId,
-    enabled: !!activeSearchSession && isSearching,
+    enabled: !!activeSearchSession,
     onProgressUpdate: (progress) => {
       setProgress(progress);
     },
@@ -304,6 +310,42 @@ export default function Home() {
       alert('Failed to cancel search');
     }
   };
+
+  // Function to update job status
+  const updateJobStatus = async (jobId: string, status: string) => {
+    try {
+      const response = await fetch(`/api/jobs/${jobId}/status`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ status })
+      });
+
+      if (response.ok) {
+        // Update local state
+        setJobResults(prev => 
+          prev.map(job => 
+            job.id === jobId 
+              ? { ...job, status, statusUpdatedAt: new Date().toISOString() }
+              : job
+          )
+        );
+      } else {
+        alert('Failed to update job status');
+      }
+    } catch (error) {
+      console.error('Error updating job status:', error);
+      alert('Failed to update job status');
+    }
+  };
+
+  // Filter jobs based on status
+  const filteredJobs = jobResults.filter(job => {
+    if (statusFilter === 'all') return true;
+    if (statusFilter === 'to_apply') return job.status === 'unread' && job.recommendation === 'apply';
+    return job.status === statusFilter;
+  });
 
   const preferencesPlaceholder = `Looking for remote software engineering roles, preferably full-stack or frontend positions. Open to $80k-120k salary range. Interested in startups or mid-size companies with good work-life balance. No interest in finance or insurance industries.`;
 
@@ -471,13 +513,70 @@ export default function Home() {
           {/* Job Results */}
           {jobResults.length > 0 && (
             <div className="mt-8">
-              <h2 className="text-2xl font-bold text-gray-900 mb-6">Job Analysis Results</h2>
+              <div className="flex justify-between items-center mb-6">
+                <h2 className="text-2xl font-bold text-gray-900">Job Analysis Results</h2>
+                <div className="text-sm text-gray-600">
+                  Showing {filteredJobs.length} of {jobResults.length} jobs
+                </div>
+              </div>
+
+              {/* Filter Tabs */}
+              <div className="flex flex-wrap gap-2 mb-6 p-1 bg-gray-100 rounded-lg">
+                {[
+                  { key: 'all', label: 'All Jobs', count: jobResults.length },
+                  { key: 'to_apply', label: 'To Apply', count: jobResults.filter(j => j.status === 'unread' && j.recommendation === 'apply').length },
+                  { key: 'unread', label: 'Unread', count: jobResults.filter(j => j.status === 'unread').length },
+                  { key: 'applied', label: 'Applied', count: jobResults.filter(j => j.status === 'applied').length },
+                  { key: 'saved_for_later', label: 'Saved', count: jobResults.filter(j => j.status === 'saved_for_later').length },
+                  { key: 'not_interested', label: 'Not Interested', count: jobResults.filter(j => j.status === 'not_interested').length }
+                ].map(tab => (
+                  <button
+                    key={tab.key}
+                    onClick={() => setStatusFilter(tab.key)}
+                    className={`px-3 py-2 rounded-md text-sm font-medium transition-all ${
+                      statusFilter === tab.key
+                        ? 'bg-white text-blue-600 shadow-sm'
+                        : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+                    }`}
+                  >
+                    {tab.label} ({tab.count})
+                  </button>
+                ))}
+              </div>
               
               <div className="space-y-6">
-                {jobResults.map((job, index) => (
-                  <div key={job.id} className="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
+                {filteredJobs.map((job, index) => (
+                  <div key={job.id} className={`bg-white border rounded-lg p-6 shadow-sm relative ${
+                    job.status === 'applied' 
+                      ? 'border-green-200 bg-green-50/30' 
+                      : job.status === 'not_interested'
+                      ? 'border-gray-200 bg-gray-50/50 opacity-75'
+                      : job.status === 'saved_for_later'
+                      ? 'border-yellow-200 bg-yellow-50/30'
+                      : 'border-gray-200'
+                  }`}>
+                    {/* Status Badge */}
+                    {job.status !== 'unread' && (
+                      <div className="absolute top-4 right-4">
+                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                          job.status === 'applied' 
+                            ? 'bg-green-100 text-green-800'
+                            : job.status === 'saved_for_later'
+                            ? 'bg-yellow-100 text-yellow-800'
+                            : job.status === 'not_interested'
+                            ? 'bg-gray-100 text-gray-600'
+                            : 'bg-blue-100 text-blue-800'
+                        }`}>
+                          {job.status === 'applied' ? '✓ Applied' 
+                           : job.status === 'saved_for_later' ? '⭐ Saved'
+                           : job.status === 'not_interested' ? '✗ Not Interested'
+                           : 'Unread'}
+                        </span>
+                      </div>
+                    )}
+
                     <div className="flex justify-between items-start mb-4">
-                      <div className="flex-1">
+                      <div className="flex-1 pr-20">
                         <h3 className="text-lg font-semibold text-gray-900 mb-1">
                           <a 
                             href={job.url} 
@@ -590,6 +689,56 @@ export default function Home() {
                         <p className="text-gray-700 text-sm">{job.summary}</p>
                       </div>
                     )}
+
+                    {/* Action Buttons */}
+                    <div className="mt-6 pt-4 border-t border-gray-100">
+                      <div className="flex flex-wrap gap-2">
+                        <button
+                          onClick={() => updateJobStatus(job.id, 'applied')}
+                          disabled={job.status === 'applied'}
+                          className={`px-3 py-1.5 rounded-md text-sm font-medium transition-all ${
+                            job.status === 'applied'
+                              ? 'bg-green-100 text-green-800 cursor-not-allowed'
+                              : 'bg-green-600 text-white hover:bg-green-700'
+                          }`}
+                        >
+                          {job.status === 'applied' ? '✓ Applied' : 'Mark as Applied'}
+                        </button>
+                        
+                        <button
+                          onClick={() => updateJobStatus(job.id, 'saved_for_later')}
+                          disabled={job.status === 'saved_for_later'}
+                          className={`px-3 py-1.5 rounded-md text-sm font-medium transition-all ${
+                            job.status === 'saved_for_later'
+                              ? 'bg-yellow-100 text-yellow-800 cursor-not-allowed'
+                              : 'bg-yellow-600 text-white hover:bg-yellow-700'
+                          }`}
+                        >
+                          {job.status === 'saved_for_later' ? '⭐ Saved' : 'Save for Later'}
+                        </button>
+                        
+                        <button
+                          onClick={() => updateJobStatus(job.id, 'not_interested')}
+                          disabled={job.status === 'not_interested'}
+                          className={`px-3 py-1.5 rounded-md text-sm font-medium transition-all ${
+                            job.status === 'not_interested'
+                              ? 'bg-gray-100 text-gray-600 cursor-not-allowed'
+                              : 'bg-gray-600 text-white hover:bg-gray-700'
+                          }`}
+                        >
+                          {job.status === 'not_interested' ? '✗ Not Interested' : 'Not Interested'}
+                        </button>
+
+                        {job.status !== 'unread' && (
+                          <button
+                            onClick={() => updateJobStatus(job.id, 'unread')}
+                            className="px-3 py-1.5 rounded-md text-sm font-medium bg-blue-100 text-blue-800 hover:bg-blue-200 transition-all"
+                          >
+                            Reset
+                          </button>
+                        )}
+                      </div>
+                    </div>
                   </div>
                 ))}
               </div>

@@ -14,7 +14,7 @@
     + probably do this via database w/ user id
 
 - [ ] [INVESTIGATE] we probably don't need to send progress updates to the client in the stream route
-
+    
 - [ ] add error handling for common failures
     + show user-friendly error messages instead of browser alerts
     + add retry button when search fails

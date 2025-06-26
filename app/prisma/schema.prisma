@@ -1,6 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -11,50 +8,53 @@ datasource db {
 }
 
 model User {
-  id        String @id
-  createdAt DateTime @default(now())
-  jobs      ProcessedJob[]
+  id             String          @id
+  createdAt      DateTime        @default(now())
+  jobs           ProcessedJob[]
   searchSessions SearchSession[]
 }
 
 model ProcessedJob {
-  id              String @id @default(cuid())
-  userId          String
-  title           String
-  company         String
-  location        String?
-  salary          String?
-  url             String
-  content         String
-  recommendation  String  // apply/maybe/skip
-  fitScore        Int     // 1-5
-  confidence      Int     // 1-5
-  summary         String
-  analysis        String
-  jobSummary      String?
-  fitSummary      String?
-  whyGoodFit      String? // JSON array
-  potentialConcerns String? // JSON array
-  keyTechnologies String? // JSON array
-  contentHash     String
-  createdAt       DateTime @default(now())
-  
-  user User @relation(fields: [userId], references: [id])
+  id                String   @id @default(cuid())
+  userId            String
+  title             String
+  company           String
+  location          String?
+  salary            String?
+  url               String
+  content           String
+  recommendation    String
+  fitScore          Int
+  confidence        Int
+  summary           String
+  analysis          String
+  jobSummary        String?
+  fitSummary        String?
+  whyGoodFit        String?
+  potentialConcerns String?
+  keyTechnologies   String?
+  contentHash       String
+  status            String   @default("unread") // unread, applied, not_interested, saved_for_later
+  statusUpdatedAt   DateTime?
+  createdAt         DateTime @default(now())
+  user              User     @relation(fields: [userId], references: [id])
+
   @@index([userId])
   @@index([userId, url])
+  @@index([userId, status])
 }
 
 model SearchSession {
-  id          String @id @default(cuid())
+  id          String    @id @default(cuid())
   userId      String
-  status      String // 'pending' | 'in_progress' | 'completed' | 'failed'
-  progress    Json   // { current: number, total: number, message: string }
+  status      String
+  progress    Json
   jobTitle    String
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
   completedAt DateTime?
-  
-  user User @relation(fields: [userId], references: [id])
+  user        User      @relation(fields: [userId], references: [id])
+
   @@index([userId])
   @@index([userId, status])
 }
