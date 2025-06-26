@@ -1,11 +1,12 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useCallback } from "react";
 import { useSearchSession } from "@/hooks/useSearchSession";
 import { useUserData } from "@/hooks/useUserData";
 import { useJobSearch } from "@/hooks/useJobSearch";
 import { useJobResults } from "@/hooks/useJobResults";
 import JobCard from "@/components/JobCard";
+import { ProcessedJob } from "@/types";
 
 export default function Home() {
   // User data and localStorage management
@@ -49,8 +50,7 @@ export default function Home() {
   } = useJobSearch({
     userId,
     onSearchComplete: refreshJobResults,
-    onJobResult: (job) => setJobResults(prev => [...prev, job]),
-    onJobSkipped: () => {}, // Already handled in useJobSearch
+    onJobResult: (job: ProcessedJob) => setJobResults(prev => [...prev, job]),
   });
 
   // Initialize data on component mount
@@ -60,27 +60,32 @@ export default function Home() {
     }
   }, [userId, initializeJobData, setActiveSearchSession, setIsSearching, setProgress, setSearchComplete]);
 
+  // Memoize callbacks to prevent infinite re-renders
+  const handleProgressUpdate = useCallback((progress) => {
+    setProgress(progress);
+  }, [setProgress]);
+
+  const handleStatusChange = useCallback((status) => {
+    console.log('Search status changed to:', status);
+    if (status === 'completed') {
+      setIsSearching(false);
+      setSearchComplete(true);
+      setActiveSearchSession(null);
+      // Refresh job results
+      refreshJobResults();
+    } else if (status === 'failed') {
+      setIsSearching(false);
+      setActiveSearchSession(null);
+      alert('Search failed. Please try again.');
+    }
+  }, [setIsSearching, setSearchComplete, setActiveSearchSession, refreshJobResults]);
+
   // Real-time search session subscription
   const { cancelSubscription } = useSearchSession({
     userId,
     enabled: !!activeSearchSession,
-    onProgressUpdate: (progress) => {
-      setProgress(progress);
-    },
-    onStatusChange: (status) => {
-      console.log('Search status changed to:', status);
-      if (status === 'completed') {
-        setIsSearching(false);
-        setSearchComplete(true);
-        setActiveSearchSession(null);
-        // Refresh job results
-        refreshJobResults();
-      } else if (status === 'failed') {
-        setIsSearching(false);
-        setActiveSearchSession(null);
-        alert('Search failed. Please try again.');
-      }
-    }
+    onProgressUpdate: handleProgressUpdate,
+    onStatusChange: handleStatusChange
   });
 
   // Enhanced handleSubmit that resets job results before search

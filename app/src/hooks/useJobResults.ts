@@ -1,26 +1,12 @@
-import { useState } from 'react';
-
-interface UseJobResultsProps {
-  userId: string;
-}
-
-interface UseJobResultsReturn {
-  jobResults: any[];
-  statusFilter: string;
-  filteredJobs: any[];
-  setJobResults: (jobs: any[]) => void;
-  setStatusFilter: (filter: string) => void;
-  refreshJobResults: () => Promise<void>;
-  updateJobStatus: (jobId: string, status: string) => Promise<void>;
-  initializeJobData: (setActiveSearchSession: (session: any) => void, setIsSearching: (searching: boolean) => void, setProgress: (progress: any) => void, setSearchComplete: (complete: boolean) => void) => Promise<void>;
-}
+import { useState, useCallback } from 'react';
+import { UseJobResultsProps, UseJobResultsReturn, ProcessedJob, SearchProgress, SearchSession, JobStatus } from '@/types';
 
 export function useJobResults({ userId }: UseJobResultsProps): UseJobResultsReturn {
-  const [jobResults, setJobResults] = useState<any[]>([]);
+  const [jobResults, setJobResults] = useState<ProcessedJob[]>([]);
   const [statusFilter, setStatusFilter] = useState<string>('all');
 
   // Function to refresh job results
-  const refreshJobResults = async () => {
+  const refreshJobResults = useCallback(async () => {
     if (!userId) return;
     
     try {
@@ -32,10 +18,10 @@ export function useJobResults({ userId }: UseJobResultsProps): UseJobResultsRetu
     } catch (error) {
       console.error('Error refreshing job results:', error);
     }
-  };
+  }, [userId, setJobResults]);
 
   // Function to update job status
-  const updateJobStatus = async (jobId: string, status: string) => {
+  const updateJobStatus = useCallback(async (jobId: string, status: JobStatus) => {
     try {
       const response = await fetch(`/api/jobs/${jobId}/status`, {
         method: 'PATCH',
@@ -61,13 +47,13 @@ export function useJobResults({ userId }: UseJobResultsProps): UseJobResultsRetu
       console.error('Error updating job status:', error);
       alert('Failed to update job status');
     }
-  };
+  }, [setJobResults]);
 
   // Initialize job data on component mount
-  const initializeJobData = async (
-    setActiveSearchSession: (session: any) => void,
+  const initializeJobData = useCallback(async (
+    setActiveSearchSession: (session: SearchSession | null) => void,
     setIsSearching: (searching: boolean) => void, 
-    setProgress: (progress: any) => void,
+    setProgress: (progress: SearchProgress) => void,
     setSearchComplete: (complete: boolean) => void
   ) => {
     if (!userId) return;
@@ -109,7 +95,7 @@ export function useJobResults({ userId }: UseJobResultsProps): UseJobResultsRetu
     } catch (error) {
       console.error('Error initializing data:', error);
     }
-  };
+  }, [userId, setJobResults]);
 
   // Filter jobs based on status
   const filteredJobs = jobResults.filter(job => {
