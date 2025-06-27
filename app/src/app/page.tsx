@@ -7,6 +7,7 @@ import { useJobSearch } from "@/hooks/useJobSearch";
 import { useJobResults } from "@/hooks/useJobResults";
 import JobCard from "@/components/JobCard";
 import { ProcessedJob } from "@/types";
+import { SearchProgress } from "@/types/search.types";
 
 export default function Home() {
   // User data and localStorage management
@@ -61,11 +62,11 @@ export default function Home() {
   }, [userId, initializeJobData, setActiveSearchSession, setIsSearching, setProgress, setSearchComplete]);
 
   // Memoize callbacks to prevent infinite re-renders
-  const handleProgressUpdate = useCallback((progress) => {
+  const handleProgressUpdate = useCallback((progress: SearchProgress) => {
     setProgress(progress);
   }, [setProgress]);
 
-  const handleStatusChange = useCallback((status) => {
+  const handleStatusChange = useCallback((status: string) => {
     console.log('Search status changed to:', status);
     if (status === 'completed') {
       setIsSearching(false);
@@ -200,6 +201,7 @@ export default function Home() {
 
             {/* Submit Button */}
             <div className="flex justify-center gap-4">
+                {/* https://magicui.design/docs/components/rainbow-button */}
               <button
                 type="submit"
                 disabled={isSearching || !!activeSearchSession}

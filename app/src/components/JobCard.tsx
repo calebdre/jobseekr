@@ -50,7 +50,7 @@ export default function JobCard({ job, onUpdateStatus }: JobCardProps) {
           </div>
           
           {/* Key Technologies */}
-          {job.key_technologies && job.key_technologies.length > 0 && (
+          {/* {job.key_technologies && job.key_technologies.length > 0 && (
             <div className="flex flex-wrap gap-2 mb-3">
               {job.key_technologies.map((tech, techIndex) => (
                 <span 
@@ -61,7 +61,7 @@ export default function JobCard({ job, onUpdateStatus }: JobCardProps) {
                 </span>
               ))}
             </div>
-          )}
+          )} */}
         </div>
         
         {/* Recommendation Badge */}

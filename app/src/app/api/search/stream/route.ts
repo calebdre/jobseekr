@@ -196,6 +196,14 @@ export async function POST(request: NextRequest) {
               }
             })}\n\n`));
 
+            const jobUrl = jobData.url;
+
+            // https://jobs.ashbyhq.com/themuralgroup/02484fdc-1695-470a-a94a-4cbf2c55c37a/application
+            // if it's an ashbyhq job and has /application at the end, remove it
+            if(jobUrl.includes('ashbyhq') && jobUrl.endsWith('/application')) {
+              jobData.url = jobUrl.slice(0, -11);
+            }
+
             const validation = await validateJobContent(jobData.url, rawContent);
             
             if (!validation.isValidJobPosting) {
