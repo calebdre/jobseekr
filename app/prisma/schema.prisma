@@ -45,15 +45,19 @@ model ProcessedJob {
 }
 
 model SearchSession {
-  id          String    @id @default(cuid())
-  userId      String
-  status      String
-  progress    Json
-  jobTitle    String
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-  completedAt DateTime?
-  user        User      @relation(fields: [userId], references: [id])
+  id             String    @id @default(cuid())
+  userId         String
+  status         String
+  progress       Json
+  jobTitle       String
+  currentPage    Int       @default(1)
+  totalResults   Int?
+  processedCount Int       @default(0)
+  batchSize      Int       @default(30)
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+  completedAt    DateTime?
+  user           User      @relation(fields: [userId], references: [id])
 
   @@index([userId])
   @@index([userId, status])

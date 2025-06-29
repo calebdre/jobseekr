@@ -7,6 +7,20 @@ export function useJobSearch({ userId, onSearchComplete, onJobResult }: UseJobSe
   const [skippedJobs, setSkippedJobs] = useState<SkippedJob[]>([]);
   const [searchComplete, setSearchComplete] = useState(false);
   const [activeSearchSession, setActiveSearchSession] = useState<SearchSession | null>(null);
+  const [batchComplete, setBatchComplete] = useState(false);
+  const [batchInfo, setBatchInfo] = useState<{
+    batch_processed: number;
+    total_processed: number;
+    total_results: number;
+    remaining: number;
+    total_applied: number;
+    message: string;
+  } | null>(null);
+  const [resultsChangedNotification, setResultsChangedNotification] = useState<{
+    oldTotal: number;
+    newTotal: number;
+    message: string;
+  } | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>, onResumeChange: (text: string) => void) => {
@@ -67,6 +81,7 @@ export function useJobSearch({ userId, onSearchComplete, onJobResult }: UseJobSe
     setSearchComplete(false);
     setSkippedJobs([]);
     setProgress({ current: 0, total: 0, status: 'Starting job search...' });
+    setResultsChangedNotification(null);
 
     try {
       // Use fetch for POST request with SSE
@@ -127,12 +142,27 @@ export function useJobSearch({ userId, onSearchComplete, onJobResult }: UseJobSe
                     setSkippedJobs(prev => [...prev, data.data]);
                     break;
                     
+                  case 'batch_complete':
+                    setBatchComplete(true);
+                    setBatchInfo(data.data);
+                    setProgress(prev => ({ ...prev, status: data.data.message }));
+                    setIsSearching(false);
+                    break;
+                    
                   case 'complete':
                     setSearchComplete(true);
+                    setBatchComplete(false);
+                    setBatchInfo(null);
                     setProgress(prev => ({ ...prev, status: data.data.message }));
                     setIsSearching(false);
                     onSearchComplete();
                     return; // Exit the loop
+                    
+                  case 'results_changed':
+                    // Show notification about result count change
+                    setResultsChangedNotification(data.data);
+                    console.log('Results changed:', data.data.message);
+                    break;
                     
                   case 'error':
                     console.error('Search error:', data.data.message);
@@ -155,6 +185,30 @@ export function useJobSearch({ userId, onSearchComplete, onJobResult }: UseJobSe
     }
   };
 
+  // Function to continue search (process next batch)
+  const handleContinueSearch = async (resumeText: string, preferences: string, jobTitle: string) => {
+    if (!userId) return;
+    
+    // Reset batch completion state
+    setBatchComplete(false);
+    setBatchInfo(null);
+    
+    // Use the same handleSubmit logic but don't reset all state
+    await handleSubmit(resumeText, preferences, jobTitle);
+  };
+
+  // Function to stop batch processing
+  const handleStopBatch = () => {
+    setBatchComplete(false);
+    setBatchInfo(null);
+    setSearchComplete(true);
+  };
+
+  // Function to dismiss results changed notification
+  const dismissResultsChangedNotification = () => {
+    setResultsChangedNotification(null);
+  };
+
   // Function to cancel active search
   const handleCancelSearch = async () => {
     if (!userId) return;
@@ -167,6 +221,8 @@ export function useJobSearch({ userId, onSearchComplete, onJobResult }: UseJobSe
       if (response.ok) {
         setIsSearching(false);
         setActiveSearchSession(null);
+        setBatchComplete(false);
+        setBatchInfo(null);
         setProgress({ current: 0, total: 0, status: 'Search cancelled' });
         console.log('Search cancelled successfully');
       }
@@ -182,12 +238,18 @@ export function useJobSearch({ userId, onSearchComplete, onJobResult }: UseJobSe
     skippedJobs,
     searchComplete,
     activeSearchSession,
+    batchComplete,
+    batchInfo,
+    resultsChangedNotification,
     setIsSearching,
     setProgress,
     setSearchComplete,
     setActiveSearchSession,
     setSkippedJobs,
     handleSubmit,
+    handleContinueSearch,
+    handleStopBatch,
+    dismissResultsChangedNotification,
     handleCancelSearch,
     handleFileUpload,
     fileInputRef,

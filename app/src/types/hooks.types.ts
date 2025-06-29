@@ -16,12 +16,29 @@ export interface UseJobSearchReturn {
   skippedJobs: SkippedJob[];
   searchComplete: boolean;
   activeSearchSession: SearchSession | null;
+  batchComplete: boolean;
+  batchInfo: {
+    batch_processed: number;
+    total_processed: number;
+    total_results: number;
+    remaining: number;
+    total_applied: number;
+    message: string;
+  } | null;
+  resultsChangedNotification: {
+    oldTotal: number;
+    newTotal: number;
+    message: string;
+  } | null;
   setIsSearching: (searching: boolean) => void;
   setProgress: (progress: SearchProgress) => void;
   setSearchComplete: (complete: boolean) => void;
   setActiveSearchSession: (session: SearchSession | null) => void;
   setSkippedJobs: (jobs: SkippedJob[]) => void;
   handleSubmit: (resumeText: string, preferences: string, jobTitle: string) => Promise<void>;
+  handleContinueSearch: (resumeText: string, preferences: string, jobTitle: string) => Promise<void>;
+  handleStopBatch: () => void;
+  dismissResultsChangedNotification: () => void;
   handleCancelSearch: () => Promise<void>;
   handleFileUpload: (event: React.ChangeEvent<HTMLInputElement>, onResumeChange: (text: string) => void) => Promise<void>;
   fileInputRef: React.RefObject<HTMLInputElement | null>;

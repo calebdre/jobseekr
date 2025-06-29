@@ -5,6 +5,7 @@ import { fetchJobContentWithRetry } from '@/lib/services/content';
 import { validateJobContent } from '@/lib/services/content-validator';
 import { analyzeJobFit } from '@/lib/services/ai';
 import { parseJobFromSearch, generateContentHash } from '@/lib/utils/parsers';
+import { SearchSession } from '@prisma/client';
 
 // Helper function to update search session progress
 async function updateSearchProgress(
@@ -42,7 +43,7 @@ export async function POST(request: NextRequest) {
   
   const stream = new ReadableStream({
     async start(controller) {
-      let searchSession: { id: string } | null = null;
+      let searchSession: SearchSession | null = null;
       try {
         // Parse request body
         const { userId, resume, preferences, jobTitle } = await request.json();
@@ -102,11 +103,72 @@ export async function POST(request: NextRequest) {
           data: { current: 0, total: 0, status: 'Searching for jobs...' }
         })}\n\n`));
         
-        const searchResults = await searchJobs(jobTitle);
+        // Auto-detect session state and calculate batch parameters
+        let currentSession = searchSession;
+        let startIndex = 1;
+        let batchSize = 30;
+        
+        // Check if this is a continuation of existing session
+        const existingActiveSession = await prisma.searchSession.findFirst({
+          where: {
+            userId,
+            status: { in: ['pending', 'in_progress'] },
+            createdAt: { gte: twoHoursAgo }
+          }
+        });
+        
+        if (existingActiveSession && existingActiveSession.id !== searchSession.id) {
+          // Use existing session instead
+          currentSession = existingActiveSession;
+          startIndex = (currentSession.currentPage - 1) * currentSession.batchSize + 1;
+          batchSize = currentSession.batchSize;
+        }
+        
+        // Check for session expiration (48 hours)
+        const fortyEightHoursAgo = new Date(Date.now() - 48 * 60 * 60 * 1000);
+        if (currentSession.createdAt < fortyEightHoursAgo) {
+          // Session expired, start fresh
+          console.log(`Session ${currentSession.id} expired, starting fresh search`);
+          startIndex = 1;
+          batchSize = 30;
+          
+          // Update session to reset pagination
+          await prisma.searchSession.update({
+            where: { id: currentSession.id },
+            data: {
+              currentPage: 1,
+              processedCount: 0,
+              totalResults: null
+            }
+          });
+        }
+        
+        const { items: searchResults, totalResults } = await searchJobs(jobTitle, startIndex, batchSize);
+        
+        // Update session with total results
+        await prisma.searchSession.update({
+          where: { id: currentSession.id },
+          data: {
+            totalResults: currentSession.totalResults !== totalResults ? totalResults : currentSession.totalResults
+          }
+        });
+        
+        // Notify client if total results changed
+        if (currentSession.totalResults && currentSession.totalResults !== totalResults) {
+          controller.enqueue(encoder.encode(`data: ${JSON.stringify({
+            type: 'results_changed',
+            data: { 
+              oldTotal: currentSession.totalResults, 
+              newTotal: totalResults,
+              message: `Search updated: Now ${totalResults} jobs (was ${currentSession.totalResults})`
+            }
+          })}\n\n`));
+        }
+        
         const totalJobs = searchResults.length;
         
         if (totalJobs === 0) {
-          await updateSearchProgress(searchSession.id, { current: 0, total: 0, message: 'No jobs found' }, 'completed');
+          await updateSearchProgress(currentSession.id, { current: 0, total: 0, message: 'No jobs found' }, 'completed');
           
           controller.enqueue(encoder.encode(`data: ${JSON.stringify({
             type: 'complete',
@@ -117,7 +179,7 @@ export async function POST(request: NextRequest) {
         }
         
         const foundJobsProgress = { current: 0, total: totalJobs, message: `Found ${totalJobs} jobs, processing...` };
-        await updateSearchProgress(searchSession.id, foundJobsProgress);
+        await updateSearchProgress(currentSession.id, foundJobsProgress);
         
         controller.enqueue(encoder.encode(`data: ${JSON.stringify({
           type: 'progress',
@@ -141,7 +203,7 @@ export async function POST(request: NextRequest) {
               total: totalJobs, 
               message: `Processing: ${jobData.title} at ${jobData.company}...` 
             };
-            await updateSearchProgress(searchSession.id, processingProgress);
+            await updateSearchProgress(currentSession.id, processingProgress);
             
             controller.enqueue(encoder.encode(`data: ${JSON.stringify({
               type: 'progress',
@@ -301,22 +363,63 @@ export async function POST(request: NextRequest) {
           }
         }
         
-        // Mark search as completed and send completion message
-        const completionMessage = `Processed ${processedCount} jobs, ${appliedCount} recommended for application`;
-        await updateSearchProgress(searchSession.id, { 
-          current: processedCount, 
-          total: totalJobs, 
-          message: completionMessage 
-        }, 'completed');
+        // Update session progress and pagination
+        const newProcessedCount = currentSession.processedCount + processedCount;
+        const newCurrentPage = currentSession.currentPage + 1;
+        const remaining = totalResults - newProcessedCount;
         
-        controller.enqueue(encoder.encode(`data: ${JSON.stringify({
-          type: 'complete',
-          data: { 
-            total_processed: processedCount, 
-            total_applied: appliedCount,
-            message: completionMessage
+        await prisma.searchSession.update({
+          where: { id: currentSession.id },
+          data: {
+            processedCount: newProcessedCount,
+            currentPage: newCurrentPage,
+            progress: {
+              current: newProcessedCount,
+              total: totalResults,
+              message: `Processed ${newProcessedCount} jobs, ${appliedCount} recommended for application`
+            }
           }
-        })}\n\n`));
+        });
+        
+        // Check if we need to continue or if we're done
+        const isComplete = remaining <= 0 || processedCount < batchSize;
+        
+        if (isComplete) {
+          // Mark search as completed
+          await updateSearchProgress(currentSession.id, { 
+            current: newProcessedCount, 
+            total: totalResults, 
+            message: `Completed: Processed ${newProcessedCount} jobs, ${appliedCount} recommended for application` 
+          }, 'completed');
+          
+          controller.enqueue(encoder.encode(`data: ${JSON.stringify({
+            type: 'complete',
+            data: { 
+              total_processed: newProcessedCount, 
+              total_applied: appliedCount,
+              message: `Completed: Processed ${newProcessedCount} jobs, ${appliedCount} recommended for application`
+            }
+          })}\n\n`));
+        } else {
+          // Mark batch as completed, but search continues
+          await updateSearchProgress(currentSession.id, { 
+            current: newProcessedCount, 
+            total: totalResults, 
+            message: `Processed ${newProcessedCount} of ${totalResults} jobs, ${appliedCount} recommended for application` 
+          }, 'in_progress');
+          
+          controller.enqueue(encoder.encode(`data: ${JSON.stringify({
+            type: 'batch_complete',
+            data: { 
+              batch_processed: processedCount,
+              total_processed: newProcessedCount,
+              total_results: totalResults,
+              remaining: remaining,
+              total_applied: appliedCount,
+              message: `Processed ${newProcessedCount} of ${totalResults} jobs. ${remaining} remaining.`
+            }
+          })}\n\n`));
+        }
         
       } catch (error) {
         console.error('Stream error:', error);
