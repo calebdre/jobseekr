@@ -1,11 +1,6 @@
 ## MVP Tasks
 - [ ] company_summary was added to ai analysis - add it to the database and job card
 
-- [ ] add logic to instead of fetching the first 10 results, a time period is specified and it fetches all results until that time period is reached
-    + see @job-posting-dates-analysis.md for advice on fetching dates from google custom search
-    + will need to add ability to paginate through results
-
-
 - [ ] add a way to collapse resume and prefs input when there's at least 1 recommendation
 
 - [ ] make the job card collapsed by default - show the job title and company name, recommendation, and analysis summary. On uncollapse, show the rest of the job card.
@@ -27,6 +22,10 @@
 - [ ] instead of using a full web page job posting, extract relevant details from the page and use that to generate the analysis
 
 ### Done
+- [~] [NEEDS TESTING] add logic to instead of fetching the first 10 results, a time period is specified and it fetches all results until that time period is reached
+    + see @job-posting-dates-analysis.md for advice on fetching dates from google custom search
+    + will need to add ability to paginate through results
+
 - [x] on page load, check DB for processed jobs and display them
 - [x] add logic to check if job has already been processed for a given user and skip processing if it has
 - [~] [NEEDS TESTING] update analysis

@@ -26,7 +26,8 @@ export async function GET(request: NextRequest) {
       potential_concerns: job.potentialConcerns ? JSON.parse(job.potentialConcerns) : [],
       key_technologies: job.keyTechnologies ? JSON.parse(job.keyTechnologies) : [],
       job_summary: job.jobSummary,
-      fit_summary: job.fitSummary
+      fit_summary: job.fitSummary,
+      company_summary: job.companySummary
     }));
 
     return NextResponse.json({ jobs: transformedJobs });

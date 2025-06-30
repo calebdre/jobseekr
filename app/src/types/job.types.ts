@@ -14,6 +14,7 @@ export interface JobAnalysis {
   confidence: number; // 1-5
   job_summary: string;
   fit_summary: string;
+  company_summary: string;
   why_good_fit: string[];
   potential_concerns: string[];
   summary: JobSummary;
@@ -36,6 +37,7 @@ export interface ProcessedJob {
   analysis: string;
   jobSummary: string | null;
   fitSummary: string | null;
+  companySummary: string | null;
   whyGoodFit: string | null; // JSON string
   potentialConcerns: string | null; // JSON string
   keyTechnologies: string | null; // JSON string
@@ -49,6 +51,7 @@ export interface ProcessedJob {
   key_technologies?: string[];
   job_summary?: string;
   fit_summary?: string;
+  company_summary?: string;
 }
 
 export type JobStatus = 'unread' | 'applied' | 'not_interested' | 'saved_for_later';
