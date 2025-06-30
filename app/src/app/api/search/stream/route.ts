@@ -2,7 +2,7 @@ import { NextRequest } from 'next/server';
 import { prisma } from '@/lib/db';
 import { searchJobs } from '@/lib/services/search';
 import { fetchJobContentWithRetry } from '@/lib/services/content';
-import { validateJobContent } from '@/lib/services/content-validator';
+import { extractJobContent } from '@/lib/services/content-validator';
 import { analyzeJobFit } from '@/lib/services/ai';
 import { parseJobFromSearch, generateContentHash } from '@/lib/utils/parsers';
 import { SearchSession } from '@prisma/client';
@@ -266,7 +266,7 @@ export async function POST(request: NextRequest) {
               jobData.url = jobUrl.slice(0, -11);
             }
 
-            const validation = await validateJobContent(jobData.url, rawContent);
+            const validation = await extractJobContent(rawContent);
             
             if (!validation.isValidJobPosting) {
               console.log(`Skipping ${jobData.url} - not an individual job posting (${validation.postingType})`);
@@ -275,7 +275,7 @@ export async function POST(request: NextRequest) {
               controller.enqueue(encoder.encode(`data: ${JSON.stringify({
                 type: 'job_skipped',
                 data: {
-                  url: jobData.url,
+                  url: jobData.url, 
                   title: jobData.title,
                   company: jobData.company,
                   reason: validation.postingType === 'LISTING' ? 'Job listing page' : 'No job information found'
@@ -323,7 +323,6 @@ export async function POST(request: NextRequest) {
                 companySummary: jobAnalysis.company_summary,
                 whyGoodFit: JSON.stringify(jobAnalysis.why_good_fit || []),
                 potentialConcerns: JSON.stringify(jobAnalysis.potential_concerns || []),
-                keyTechnologies: JSON.stringify(jobAnalysis.summary?.key_technologies || []),
                 contentHash
               }
             });
@@ -351,8 +350,8 @@ export async function POST(request: NextRequest) {
                 company_summary: savedJob.companySummary,
                 why_good_fit: savedJob.whyGoodFit ? JSON.parse(savedJob.whyGoodFit) : [],
                 potential_concerns: savedJob.potentialConcerns ? JSON.parse(savedJob.potentialConcerns) : [],
-                key_technologies: savedJob.keyTechnologies ? JSON.parse(savedJob.keyTechnologies) : [],
-                createdAt: savedJob.createdAt
+                createdAt: savedJob.createdAt,
+                analysis: savedJob.analysis
               }
             })}\n\n`));
             

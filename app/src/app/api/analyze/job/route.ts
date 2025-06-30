@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { fetchJobContentWithRetry } from '@/lib/services/content';
-import { validateJobContent } from '@/lib/services/content-validator';
+import { extractJobContent } from '@/lib/services/content-validator';
 import { analyzeJobFit } from '@/lib/services/ai';
 
 /**
@@ -34,7 +34,7 @@ export async function POST(request: NextRequest) {
     }
     
     // Validate if this is an individual job posting
-    const validation = await validateJobContent(url, rawContent);
+    const validation = await extractJobContent(rawContent);
     
     if (!validation.isValidJobPosting) {
       return NextResponse.json(

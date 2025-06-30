@@ -5,7 +5,6 @@ export interface JobSummary {
   company: string;
   location: string;
   salary_range: string;
-  key_technologies: string[];
 }
 
 export interface JobAnalysis {

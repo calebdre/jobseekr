@@ -74,7 +74,6 @@ Respond with JSON in this EXACT format:
     "company": "company name",
     "location": "location/remote status or 'Not specified'",
     "salary_range": "salary if mentioned or 'Not specified'",
-    "key_technologies": ["main", "technologies", "mentioned"]
   },
   "analysis": "2-5 sentences: Your honest take on this opportunity - what makes sense, what doesn't, and your bottom-line recommendation of whether or not to apply"
 }
@@ -154,10 +153,12 @@ Respond with JSON in this EXACT format:
     "company": "company name",
     "location": "location/remote status or 'Not specified'",
     "salary_range": "salary if mentioned or 'Not specified'",
-    "key_technologies": ["main", "technologies", "mentioned"]
   },
   "analysis": "Your honest take on this opportunity - what makes sense, what doesn't, and your bottom-line recommendation of whether or not to apply. Lead with the most critical reason for your decision."
-}`
+}
+  
+QUICK CHECK: 
+- are your responses directly addressing your client (i.e. using "you/your")?`
 
 export async function analyzeJobFit(
   jobContent: string, 
@@ -205,7 +206,6 @@ export async function analyzeJobFit(
         company: 'Not specified',
         location: 'Not specified',
         salary_range: 'Not specified',
-        key_technologies: []
       };
     }
 
@@ -224,6 +224,7 @@ export async function analyzeJobFit(
     return {
       recommendation: 'maybe',
       fitScore: 3,
+      company_summary: 'Company summary not available due to AI service error',
       confidence: 1,
       job_summary: 'Analysis unavailable due to AI service error',
       fit_summary: 'Could not analyze job fit due to technical issues',
@@ -234,7 +235,6 @@ export async function analyzeJobFit(
         company: 'Not specified',
         location: 'Not specified',
         salary_range: 'Not specified',
-        key_technologies: []
       },
       analysis: 'Could not analyze job fit due to technical issues. Manual review recommended.'
     };
@@ -253,14 +253,27 @@ const runPromptWithTogetherAI = async (prompt: string) => {
         content: prompt
       }
     ],
-    model: "meta-llama/Llama-3.3-70B-Instruct-Turbo-Free",
-    temperature: 0.3,
-    max_tokens: 1000
+    // model: "meta-llama/Llama-3.3-70B-Instruct-Turbo-Free",
+    model: "deepseek-ai/DeepSeek-R1-Distill-Llama-70B-free",
+    // model: "lgai/exaone-deep-32b",
+    temperature: 0.6,
+    max_tokens: 4096
   });
 
-  const content = response.choices[0]?.message?.content;
+  console.log(`Together AI response: ${JSON.stringify(response, null, 2)}`)
+  let content = response.choices[0]?.message?.content;
   if (!content) {
     throw new Error("No response from Gemini");
+  }
+
+  // for exaone model
+  if (content.includes('</thought>')) {
+    // remove everything before </thought>
+    content = content.split('</thought>')[1];
+  }
+
+  if (content.includes('```json')) {
+    content = content.replace('```json', '').replace('```', '');
   }
 
   return content;
