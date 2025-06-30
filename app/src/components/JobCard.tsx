@@ -74,11 +74,11 @@ export default function JobCard({ job, onUpdateStatus }: JobCardProps) {
         </div>
       </div>
 
-      {/* Company Summary - Always Visible */}
-      {job.company_summary && (
+      {/* Fit Analysis - Always Visible */}
+      {job.analysis && (
         <div className="mb-4">
-          <h4 className="text-sm font-medium text-gray-900 mb-1">Company</h4>
-          <p className="text-sm text-gray-700">{job.company_summary}</p>
+          <h4 className="text-sm font-medium text-gray-900 mb-1">Analysis</h4>
+          <p className="text-sm text-gray-700">{job.analysis}</p>
         </div>
       )}
 
@@ -109,11 +109,11 @@ export default function JobCard({ job, onUpdateStatus }: JobCardProps) {
             </div>
           )}
           
-          {/* Fit Summary */}
-          {job.fit_summary && (
+          {/* Company Summary - Moved to expanded section */}
+          {job.company_summary && (
             <div className="mb-4">
-              <h4 className="text-sm font-medium text-gray-900 mb-1">Fit Assessment</h4>
-              <p className="text-sm text-gray-700">{job.fit_summary}</p>
+              <h4 className="text-sm font-medium text-gray-900 mb-1">Company</h4>
+              <p className="text-sm text-gray-700">{job.company_summary}</p>
             </div>
           )}
           
@@ -155,16 +155,6 @@ export default function JobCard({ job, onUpdateStatus }: JobCardProps) {
                   </ul>
                 </div>
               )}
-            </div>
-          )}
-
-          {/* Raw Analysis */}
-          {job.analysis && (
-            <div className="mb-4">
-              <h4 className="text-sm font-medium text-gray-900 mb-1">Raw Analysis</h4>
-              <div className="bg-gray-50 rounded-md p-3 text-sm text-gray-700 whitespace-pre-wrap">
-                {job.analysis}
-              </div>
             </div>
           )}
           

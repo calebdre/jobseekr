@@ -95,10 +95,9 @@ export default function Home() {
     onStatusChange: handleStatusChange
   });
 
-  // Enhanced handleSubmit that resets job results before search
+  // Enhanced handleSubmit that preserves existing job results during search
   const handleFormSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setJobResults([]); // Clear previous results
     await handleSubmit(resumeText, preferences, jobTitle);
   };
 

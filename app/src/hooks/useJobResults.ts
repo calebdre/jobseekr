@@ -97,12 +97,14 @@ export function useJobResults({ userId }: UseJobResultsProps): UseJobResultsRetu
     }
   }, [userId, setJobResults]);
 
-  // Filter jobs based on status
-  const filteredJobs = jobResults.filter(job => {
-    if (statusFilter === 'all') return true;
-    if (statusFilter === 'to_apply') return job.status === 'unread' && job.recommendation === 'apply';
-    return job.status === statusFilter;
-  });
+  // Filter and sort jobs based on status (latest processed first)
+  const filteredJobs = jobResults
+    .filter(job => {
+      if (statusFilter === 'all') return true;
+      if (statusFilter === 'to_apply') return job.status === 'unread' && job.recommendation === 'apply';
+      return job.status === statusFilter;
+    })
+    .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 
   return {
     jobResults,
