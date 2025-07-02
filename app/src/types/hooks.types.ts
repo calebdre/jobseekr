@@ -38,6 +38,8 @@ export interface UseJobSearchReturn {
   handleSubmit: (resumeText: string, preferences: string, jobTitle: string) => Promise<void>;
   handleContinueSearch: (resumeText: string, preferences: string, jobTitle: string) => Promise<void>;
   handleStopBatch: () => void;
+  handlePauseSearch: () => void;
+  handleResumeSearch: (resumeText: string, preferences: string, jobTitle: string) => Promise<void>;
   dismissResultsChangedNotification: () => void;
   handleCancelSearch: () => Promise<void>;
   handleFileUpload: (event: React.ChangeEvent<HTMLInputElement>, onResumeChange: (text: string) => void) => Promise<void>;

@@ -45,6 +45,9 @@ export function useSearchSession({ userId, onProgressUpdate, onStatusChange, ena
             onStatusChange(newData.status);
             console.log('Search completed, unsubscribing from real-time updates');
             channel.unsubscribe();
+          } else if (newData.status === 'paused') {
+            onStatusChange(newData.status);
+            console.log('Search paused, keeping subscription active for resume');
           }
         }
       )

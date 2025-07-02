@@ -21,6 +21,7 @@ export function useJobSearch({ userId, onSearchComplete, onJobResult }: UseJobSe
     newTotal: number;
     message: string;
   } | null>(null);
+  const [abortController, setAbortController] = useState<AbortController | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>, onResumeChange: (text: string) => void) => {
@@ -70,8 +71,8 @@ export function useJobSearch({ userId, onSearchComplete, onJobResult }: UseJobSe
       return;
     }
 
-    // Check if search is already in progress
-    if (isSearching || activeSearchSession) {
+    // Check if search is already in progress (but allow resume from paused)
+    if (isSearching || (activeSearchSession && activeSearchSession.status !== 'paused')) {
       alert("Search already in progress. Please wait for it to complete.");
       return;
     }
@@ -83,6 +84,10 @@ export function useJobSearch({ userId, onSearchComplete, onJobResult }: UseJobSe
     setProgress({ current: 0, total: 0, status: 'Starting job search...' });
     setResultsChangedNotification(null);
 
+    // Create abort controller for cancellation
+    const controller = new AbortController();
+    setAbortController(controller);
+
     try {
       // Use fetch for POST request with SSE
       const response = await fetch('/api/search/stream', {
@@ -90,6 +95,7 @@ export function useJobSearch({ userId, onSearchComplete, onJobResult }: UseJobSe
         headers: {
           'Content-Type': 'application/json',
         },
+        signal: controller.signal,
         body: JSON.stringify({
           userId,
           resume: resumeText,
@@ -115,6 +121,7 @@ export function useJobSearch({ userId, onSearchComplete, onJobResult }: UseJobSe
         
         if (done) {
           setIsSearching(false);
+          setAbortController(null);
           break;
         }
 
@@ -132,6 +139,11 @@ export function useJobSearch({ userId, onSearchComplete, onJobResult }: UseJobSe
                 switch (data.type) {
                   case 'progress':
                     setProgress(data.data);
+                    break;
+                    
+                  case 'paused':
+                    setIsSearching(false);
+                    setAbortController(null);
                     break;
                     
                   case 'job':
@@ -155,6 +167,7 @@ export function useJobSearch({ userId, onSearchComplete, onJobResult }: UseJobSe
                     setBatchInfo(null);
                     setProgress(prev => ({ ...prev, status: data.data.message }));
                     setIsSearching(false);
+                    setAbortController(null);
                     onSearchComplete();
                     return; // Exit the loop
                     
@@ -168,6 +181,7 @@ export function useJobSearch({ userId, onSearchComplete, onJobResult }: UseJobSe
                     console.error('Search error:', data.data.message);
                     alert(`Search error: ${data.data.message}`);
                     setIsSearching(false);
+                    setAbortController(null);
                     return; // Exit the loop
                 }
               }
@@ -181,7 +195,14 @@ export function useJobSearch({ userId, onSearchComplete, onJobResult }: UseJobSe
     } catch (error) {
       console.error('Error starting search:', error);
       setIsSearching(false);
-      alert('Failed to start job search');
+      setAbortController(null);
+      
+      // Check if it was an abort error (user cancelled)
+      if (error instanceof Error && error.name === 'AbortError') {
+        console.log('Search was cancelled by user');
+      } else {
+        alert('Failed to start job search');
+      }
     }
   };
 
@@ -209,26 +230,53 @@ export function useJobSearch({ userId, onSearchComplete, onJobResult }: UseJobSe
     setResultsChangedNotification(null);
   };
 
-  // Function to cancel active search
-  const handleCancelSearch = async () => {
+  // Function to pause active search
+  const handlePauseSearch = async () => {
     if (!userId) return;
     
+    // First, abort the ongoing fetch request to stop streaming
+    if (abortController) {
+      console.log('Aborting search request...');
+      abortController.abort();
+      setAbortController(null);
+    }
+    
     try {
+      // Call API to mark session as paused in database
       const response = await fetch(`/api/search/status?userId=${encodeURIComponent(userId)}`, {
         method: 'DELETE'
       });
       
       if (response.ok) {
-        setIsSearching(false);
-        setActiveSearchSession(null);
-        setBatchComplete(false);
-        setBatchInfo(null);
-        setProgress({ current: 0, total: 0, status: 'Search cancelled' });
-        console.log('Search cancelled successfully');
+        const result = await response.json();
+        if (result.paused) {
+          setIsSearching(false);
+          setBatchComplete(false);
+          setBatchInfo(null);
+          // Keep activeSearchSession and progress for resume
+          console.log('Search paused successfully');
+        }
       }
     } catch (error) {
-      console.error('Error cancelling search:', error);
-      alert('Failed to cancel search');
+      console.error('Error pausing search:', error);
+      alert('Failed to pause search');
+    }
+  };
+
+  // Function to resume paused search
+  const handleResumeSearch = async (resumeText: string, preferences: string, jobTitle: string) => {
+    if (!userId) return;
+    
+    try {
+      // Attempt to resume by starting a new search - the backend will detect existing session
+      await handleSubmit(resumeText, preferences, jobTitle);
+    } catch (error) {
+      console.error('Error resuming search:', error);
+      // If resume fails (e.g., session expired), start fresh search
+      console.log('Resume failed, starting fresh search');
+      setActiveSearchSession(null);
+      setProgress({ current: 0, total: 0, status: '' });
+      await handleSubmit(resumeText, preferences, jobTitle);
     }
   };
 
@@ -246,11 +294,13 @@ export function useJobSearch({ userId, onSearchComplete, onJobResult }: UseJobSe
     setSearchComplete,
     setActiveSearchSession,
     setSkippedJobs,
+    handleCancelSearch: handlePauseSearch,
     handleSubmit,
     handleContinueSearch,
     handleStopBatch,
     dismissResultsChangedNotification,
-    handleCancelSearch,
+    handlePauseSearch,
+    handleResumeSearch,
     handleFileUpload,
     fileInputRef,
   };

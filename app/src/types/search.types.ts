@@ -9,7 +9,7 @@ export interface SearchProgress {
 export interface SearchSession {
   id: string;
   userId: string;
-  status: 'pending' | 'in_progress' | 'completed' | 'failed';
+  status: 'pending' | 'in_progress' | 'completed' | 'failed' | 'paused';
   progress: {
     current: number;
     total: number;

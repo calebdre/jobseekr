@@ -17,7 +17,7 @@ export async function GET(request: NextRequest) {
       where: {
         userId,
         status: {
-          in: ['pending', 'in_progress']
+          in: ['pending', 'in_progress', 'paused']
         },
         createdAt: {
           gte: twoHoursAgo
@@ -62,7 +62,7 @@ export async function DELETE(request: NextRequest) {
       return NextResponse.json({ error: 'User ID is required' }, { status: 400 });
     }
 
-    // Cancel active search by marking as failed
+    // Pause active search instead of cancelling
     const result = await prisma.searchSession.updateMany({
       where: {
         userId,
@@ -71,19 +71,15 @@ export async function DELETE(request: NextRequest) {
         }
       },
       data: {
-        status: 'failed',
-        completedAt: new Date(),
-        progress: {
-          current: 0,
-          total: 0,
-          message: 'Search cancelled by user'
-        }
+        status: 'paused',
+        updatedAt: new Date()
+        // Note: We don't set completedAt for paused sessions, and preserve existing progress
       }
     });
 
     return NextResponse.json({ 
-      cancelled: result.count > 0,
-      cancelledCount: result.count 
+      paused: result.count > 0,
+      pausedCount: result.count 
     });
 
   } catch (error) {
