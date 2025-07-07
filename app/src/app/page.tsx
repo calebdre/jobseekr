@@ -6,8 +6,10 @@ import { useUserData } from "@/hooks/useUserData";
 import { useJobSearch } from "@/hooks/useJobSearch";
 import { useJobResults } from "@/hooks/useJobResults";
 import { JobStatus, ProcessedJob, SearchProgress } from "@/types";
-import JobListing from "@/components/JobListing";
-
+import HackerNewsContainer from "@/components/HackerNewsContainer";
+import { ConvexProvider, ConvexReactClient } from "convex/react";
+// import JobListing from "@/components/JobListing";
+const convexClient = new ConvexReactClient(process.env.NEXT_PUBLIC_CONVEX_DEV_URL!);
 export default function Home() {
   // User data and localStorage management
   const {
@@ -134,7 +136,10 @@ export default function Home() {
             Job Search Setup
           </h1>
           
-          <form onSubmit={handleFormSubmit} className="space-y-8">
+          <form 
+            // onSubmit={handleFormSubmit} 
+            className="space-y-8"
+          >
             {/* Job Title Section */}
             <div>
               <label htmlFor="jobTitle" className="block text-lg font-medium text-gray-700 mb-1">
@@ -161,8 +166,11 @@ export default function Home() {
               <label htmlFor="resume" className="block text-lg font-medium text-gray-700 mb-1">
                 Resume
               </label>
-              <p className="text-sm text-gray-500 mb-3 max-w-lg">
+              <p className="text-sm text-gray-500 max-w-lg">
                 Copy and paste your resume content, or upload a PDF file. Include your experience, skills, education, and any relevant background.
+              </p>
+              <p className="text-sm text-gray-500 mb-3 max-w-lg">
+                Don't worry about formatting - the AI will handle it.
               </p>
               <textarea
                 id="resume"
@@ -190,18 +198,6 @@ export default function Home() {
                 onChange={(e) => handleFileUpload(e, handleResumeChange)}
                 className="hidden"
               />
-              
-              {/* Helpful message when resume has content */}
-              {resumeText.length > 50 && (
-                <div className="mt-2 text-sm text-gray-600 bg-gray-50 rounded-lg p-3 border-l-4 border-blue-400">
-                  <span className="flex items-center">
-                    <svg className="w-4 h-4 mr-2 text-blue-500" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
-                    </svg>
-                    Perfect! Our AI can understand any format - no need to worry about structure, bullet points, or formatting.
-                  </span>
-                </div>
-              )}
             </div>
 
             {/* Preferences Section */}
@@ -220,44 +216,17 @@ export default function Home() {
                 placeholder={preferencesPlaceholder}
               />
             </div>
-
-            {/* Submit Button */}
-            <div className="flex justify-center gap-4">
-              {getButtonState() === 'paused' ? (
-                <button
-                  type="button"
-                  onClick={handleFormResumeSearch}
-                  className="font-medium py-3 px-8 rounded-lg bg-green-600 hover:bg-green-700 text-white transition-colors duration-200 text-lg"
-                >
-                  Resume Search
-                </button>
-              ) : (
-                <button
-                  type="submit"
-                  disabled={getButtonState() === 'searching' || getButtonState() === 'active'}
-                  className={`font-medium py-3 px-8 rounded-lg transition-colors duration-200 text-lg ${
-                    getButtonState() === 'searching' || getButtonState() === 'active'
-                      ? 'bg-gray-400 cursor-not-allowed text-gray-200' 
-                      : 'bg-blue-600 hover:bg-blue-700 text-white'
-                  }`}
-                >
-                  {getButtonState() === 'searching' ? 'Searching...' : 'Start Job Search'}
-                </button>
-              )}
-              
-              {(getButtonState() === 'searching' || getButtonState() === 'active') && (
-                <button
-                  type="button"
-                  onClick={handleFormPauseSearch}
-                  className="font-medium py-3 px-6 rounded-lg bg-yellow-600 hover:bg-yellow-700 text-white transition-colors duration-200 text-lg"
-                >
-                  Pause Search
-                </button>
-              )}
-            </div>
           </form>
 
-          <JobListing
+          <div className="h-12" />
+          <ConvexProvider client={convexClient}>
+            <HackerNewsContainer 
+              userId={userId}
+              resumeText={resumeText}
+              preferences={preferences}
+            />
+          </ConvexProvider>
+          {/* <JobListing
             jobResults={jobResults}
             filteredJobs={filteredJobs}
             statusFilter={statusFilter}
@@ -265,7 +234,7 @@ export default function Home() {
             updateJobStatus={async (jobId: string, status: string) => {
               await updateJobStatus(jobId, status as JobStatus);
             }}
-            progress={progress}
+            progress={progress} 
             activeSearchSession={activeSearchSession}
             isSearching={isSearching}
             searchComplete={searchComplete}
@@ -278,9 +247,10 @@ export default function Home() {
             onContinueSearch={() => handleContinueSearch(resumeText, preferences, jobTitle)}
             onStopBatch={handleStopBatch}
             onDismissNotification={dismissResultsChangedNotification}
-          />
+          /> */}
         </div>
       </div>
     </div>
   );
 }
+
