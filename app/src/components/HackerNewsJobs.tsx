@@ -113,7 +113,7 @@ export default function HackerNewsJobs({ threadId, userId, resumeText, preferenc
         )}
         
         {/* Processing Status */}
-        {isProcessing && (
+        {/* {isProcessing && ( */}
           <ProcessingStatus 
             thread={thread}
             isProcessing={isProcessing}
@@ -122,7 +122,7 @@ export default function HackerNewsJobs({ threadId, userId, resumeText, preferenc
             onPauseProcessing={handlePauseProcessing}
             onResumeProcessing={handleResumeProcessing}
           />
-        )}
+        {/* )} */}
       </div>
 
       {/* Job Comments */}

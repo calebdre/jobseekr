@@ -56,12 +56,12 @@ export const useHackernewsThreadsConvex = (threadId: string): UseHackernewsThrea
 
   // Auto-fetch thread if it doesn't exist in the database
   useEffect(() => {
-    if (threadId && data === null && !fetchedThreads.current.has(threadId)) {
+    if (threadId && !fetchedThreads.current.has(threadId)) {
       console.log(`Thread ${threadId} not found in database, fetching from HackerNews...`);
       fetchedThreads.current.add(threadId);
       fetchThread(threadId);
     }
-  }, [threadId, data, fetchThread]);
+  }, [threadId, fetchThread]);
 
   // Check and start processing for idle threads with unprocessed comments
   useEffect(() => {

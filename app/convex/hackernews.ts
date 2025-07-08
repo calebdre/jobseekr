@@ -17,19 +17,10 @@ export const fetchHackerNewsThread = action({
     try {
       console.log(`Fetching thread ${args.threadId} from HackerNews API...`);
       
-      // Check if thread already exists and was fetched recently
+      // Check if thread already exists
       const existingThread = await ctx.runQuery(api.hackernews.checkThreadExists, {
         threadId: args.threadId,
       });
-      
-      if (existingThread && existingThread.shouldSkip) {
-        console.log(`Thread ${args.threadId} was fetched recently, skipping fetch but checking processing status`);
-        // Even if we skip fetching, check if we need to start processing
-        await ctx.runMutation(api.hackernews.checkAndStartProcessing, {
-          threadId: args.threadId,
-        });
-        return existingThread.threadId;
-      }
       
       // Mark as fetching
       if (existingThread) {
@@ -64,7 +55,7 @@ export const fetchHackerNewsThread = action({
   },
 });
 
-// Helper query to check if thread exists and if we should skip fetching
+// Helper query to check if thread exists
 export const checkThreadExists = query({
   args: {
     threadId: v.string(),
@@ -79,12 +70,9 @@ export const checkThreadExists = query({
       return null;
     }
     
-    const now = Date.now();
-    const shouldSkip = (now - existingThread.lastFetched) < 5 * 60 * 1000; // 5 minutes
-    
     return {
       threadId: existingThread._id,
-      shouldSkip,
+      shouldSkip: false, // Always fetch to get latest comments
     };
   },
 });
