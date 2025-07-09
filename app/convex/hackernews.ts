@@ -300,6 +300,7 @@ export const getThreadWithComments = query({
     const comments = await ctx.db
       .query("hackernews_comments")
       .withIndex("by_threadId", (q) => q.eq("threadId", args.threadId))
+      .filter((q) => q.eq(q.field("jobData.isValidJobPosting"), true))
       .collect();
     
     // Sort comments by time (newest first)

@@ -2,6 +2,7 @@
 
 import { useHackernewsThreadsConvex } from '@/hooks/useHackernewsThreadsConvex';
 import ProcessingStatus from './ProcessingStatus';
+import BulkAnalysisStatus from './BulkAnalysisStatus';
 import HackerNewsCommentsList from './HackerNewsCommentsList';
 import { formatTime } from '@/lib/utils/formatTime';
 
@@ -113,16 +114,22 @@ export default function HackerNewsJobs({ threadId, userId, resumeText, preferenc
         )}
         
         {/* Processing Status */}
-        {/* {isProcessing && ( */}
-          <ProcessingStatus 
-            thread={thread}
-            isProcessing={isProcessing}
-            progress={progress}
-            onStartProcessing={handleStartProcessing}
-            onPauseProcessing={handlePauseProcessing}
-            onResumeProcessing={handleResumeProcessing}
-          />
-        {/* )} */}
+        <ProcessingStatus 
+          thread={thread}
+          isProcessing={isProcessing}
+          progress={progress}
+          onStartProcessing={handleStartProcessing}
+          onPauseProcessing={handlePauseProcessing}
+          onResumeProcessing={handleResumeProcessing}
+        />
+        
+        {/* Bulk Analysis Status */}
+        <BulkAnalysisStatus 
+          threadId={threadId}
+          userId={userId}
+          resumeText={resumeText}
+          preferences={preferences}
+        />
       </div>
 
       {/* Job Comments */}

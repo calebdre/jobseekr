@@ -76,4 +76,25 @@ export default defineSchema({
     .index("by_user_and_thread", ["userId", "threadId"])
     .index("by_commentId", ["commentId"])
     .index("by_threadId", ["threadId"]),
+
+  bulk_analysis_sessions: defineTable({
+    userId: v.string(),
+    threadId: v.string(),
+    status: v.union(
+      v.literal("processing"),
+      v.literal("completed"),
+      v.literal("paused")
+    ),
+    resumeText: v.string(),
+    preferences: v.string(),
+    startedAt: v.number(),
+    completedAt: v.optional(v.number()),
+    lastProcessedAt: v.optional(v.number()),
+    requestsInCurrentMinute: v.number(),
+    currentMinuteStart: v.number(),
+    maxRequestsPerMinute: v.number(),
+  })
+    .index("by_userId", ["userId"])
+    .index("by_status", ["status"])
+    .index("by_user_and_thread", ["userId", "threadId"]),
 });

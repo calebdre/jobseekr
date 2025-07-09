@@ -1,9 +1,10 @@
 import { useState } from 'react';
 import { ChevronDownIcon, ChevronUpIcon } from 'lucide-react';
+import { Collapse } from '@mantine/core';
 import { formatTime } from "@/lib/utils/formatTime";
 import { useAction, useMutation, useQuery } from "convex/react";
 import { api } from "../../convex/_generated/api";
-import { Doc, Id } from "../../convex/_generated/dataModel";
+import { SafeJobPosting } from './SafeJobPosting';
 
 interface ProcessedComment {
   _id: string;
@@ -98,161 +99,163 @@ export default function HackerNewsProcessedComment({ comment, userId, resumeText
             </span> */}
           </div>
           
-          {!isExpanded ? (
-            // COLLAPSED: Show extracted job data
-            <div className="space-y-2">
-              {comment.jobData.jobTitle && (
-                <div className="text-sm">
-                  <strong className="text-gray-900">Job:</strong> 
-                  <span className="ml-1 text-gray-700">{comment.jobData.jobTitle}</span>
-                </div>
-              )}
-              
-              {comment.jobData.company && (
-                <div className="text-sm">
-                  <strong className="text-gray-900">Company:</strong> 
-                  <span className="ml-1 text-gray-700">{comment.jobData.company}</span>
-                </div>
-              )}
-              
-              {comment.jobData.location && (
-                <div className="text-sm">
-                  <strong className="text-gray-900">Location:</strong> 
-                  <span className="ml-1 text-gray-700">{comment.jobData.location}</span>
-                </div>
-              )}
-              
-              {comment.jobData.salary && (
-                <div className="text-sm">
-                  <strong className="text-gray-900">Salary:</strong> 
-                  <span className="ml-1 text-gray-700">{comment.jobData.salary}</span>
-                </div>
-              )}
-              
-              {comment.jobData.technologies && comment.jobData.technologies.length > 0 && (
-                <div className="text-sm">
-                  <strong className="text-gray-900">Technologies:</strong> 
-                  <div className="mt-1 flex flex-wrap gap-1">
-                    {comment.jobData.technologies.map((tech, index) => (
-                      <span 
-                        key={index}
-                        className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded"
-                      >
-                        {tech}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              )}
-              
-              {comment.jobData.experienceLevel && (
-                <div className="text-sm">
-                  <strong className="text-gray-900">Experience:</strong> 
-                  <span className="ml-1 text-gray-700">{comment.jobData.experienceLevel}</span>
-                </div>
-              )}
-              
-              {comment.jobData.roleOverview && (
-                <div className="text-sm">
-                  <strong className="text-gray-900">Role:</strong> 
-                  <span className="ml-1 text-gray-700">{comment.jobData.roleOverview}</span>
-                </div>
-              )}
-              
-              {comment.jobData.contactInfo && (
-                <div className="text-sm">
-                  <strong className="text-gray-900">Contact:</strong> 
-                  <span className="ml-1 text-blue-600">{comment.jobData.contactInfo}</span>
-                </div>
-              )}
-              
-              {/* Job Fit Analysis Button */}
-              <div className="mt-3 pt-3 border-t border-gray-100">
-                <button
-                  onClick={handleAnalyzeJobFit}
-                  disabled={!canAnalyze || isAnalyzing}
-                  title={!canAnalyze ? getDisabledMessage() : "Analyze how well this job fits your profile"}
-                  className={`px-3 py-2 text-sm font-medium rounded-lg transition-colors ${
-                    canAnalyze && !isAnalyzing
-                      ? 'bg-blue-600 text-white hover:bg-blue-700'
-                      : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                  }`}
-                >
-                  {isAnalyzing ? (
-                    <span className="flex items-center">
-                      <div className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full mr-2"></div>
-                      Analyzing...
-                    </span>
-                  ) : existingAnalysis ? (
-                    'Re-analyze Job Fit'
-                  ) : (
-                    'Analyze Job Fit'
-                  )}
-                </button>
+          {/* Default view: Show extracted job data */}
+          <div className="space-y-2">
+            {comment.jobData.jobTitle && (
+              <div className="text-sm">
+                <strong className="text-gray-900">Job:</strong> 
+                <span className="ml-1 text-gray-700">{comment.jobData.jobTitle}</span>
               </div>
-              
-              {/* Analysis Results */}
-              {existingAnalysis && (
-                <div className="mt-4 p-3 bg-gray-50 rounded-lg border">
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-sm font-medium text-gray-900">Job Fit Analysis</span>
-                    <div className="flex items-center gap-2">
-                      <span className={`px-2 py-1 text-xs rounded ${
-                        existingAnalysis.recommendation === 'apply' 
-                          ? 'bg-green-100 text-green-800'
-                          : existingAnalysis.recommendation === 'maybe'
-                          ? 'bg-yellow-100 text-yellow-800'
-                          : 'bg-red-100 text-red-800'
-                      }`}>
-                        {existingAnalysis.recommendation}
-                      </span>
-                      <span className="text-xs text-gray-500">
-                        Fit: {existingAnalysis.fitScore}/5
-                      </span>
-                    </div>
-                  </div>
-                  
-                  <div className="text-sm text-gray-700 mb-2">
-                    <strong>Summary:</strong> {existingAnalysis.fitSummary}
-                  </div>
-                  
-                  {existingAnalysis.whyGoodFit.length > 0 && (
-                    <div className="text-sm mb-2">
-                      <strong className="text-green-700">Good Fit:</strong>
-                      <ul className="mt-1 ml-4 list-disc text-gray-700">
-                        {existingAnalysis.whyGoodFit.map((item, index) => (
-                          <li key={index}>{item}</li>
-                        ))}
-                      </ul>
-                    </div>
-                  )}
-                  
-                  {existingAnalysis.potentialConcerns.length > 0 && (
-                    <div className="text-sm">
-                      <strong className="text-red-700">Concerns:</strong>
-                      <ul className="mt-1 ml-4 list-disc text-gray-700">
-                        {existingAnalysis.potentialConcerns.map((item, index) => (
-                          <li key={index}>{item}</li>
-                        ))}
-                      </ul>
-                    </div>
-                  )}
+            )}
+            
+            {comment.jobData.company && (
+              <div className="text-sm">
+                <strong className="text-gray-900">Company:</strong> 
+                <span className="ml-1 text-gray-700">{comment.jobData.company}</span>
+              </div>
+            )}
+            
+            {comment.jobData.location && (
+              <div className="text-sm">
+                <strong className="text-gray-900">Location:</strong> 
+                <span className="ml-1 text-gray-700">{comment.jobData.location}</span>
+              </div>
+            )}
+            
+            {comment.jobData.salary && (
+              <div className="text-sm">
+                <strong className="text-gray-900">Salary:</strong> 
+                <span className="ml-1 text-gray-700">{comment.jobData.salary}</span>
+              </div>
+            )}
+            
+            {comment.jobData.technologies && comment.jobData.technologies.length > 0 && (
+              <div className="text-sm">
+                <strong className="text-gray-900">Technologies:</strong> 
+                <div className="mt-1 flex flex-wrap gap-1">
+                  {comment.jobData.technologies.map((tech, index) => (
+                    <span 
+                      key={index}
+                      className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded"
+                    >
+                      {tech}
+                    </span>
+                  ))}
                 </div>
-              )}
+              </div>
+            )}
+            
+            {comment.jobData.experienceLevel && (
+              <div className="text-sm">
+                <strong className="text-gray-900">Experience:</strong> 
+                <span className="ml-1 text-gray-700">{comment.jobData.experienceLevel}</span>
+              </div>
+            )}
+            
+            {comment.jobData.roleOverview && (
+              <div className="text-sm">
+                <strong className="text-gray-900">Role:</strong> 
+                <span className="ml-1 text-gray-700">{comment.jobData.roleOverview}</span>
+              </div>
+            )}
+            
+            {comment.jobData.contactInfo && (
+              <div className="text-sm">
+                <strong className="text-gray-900">Contact:</strong> 
+                <span className="ml-1 text-blue-600">{comment.jobData.contactInfo}</span>
+              </div>
+            )}
+            
+            {/* Job Fit Analysis Button */}
+            <div className="mt-3 pt-3 border-t border-gray-100">
+              <button
+                onClick={handleAnalyzeJobFit}
+                disabled={!canAnalyze || isAnalyzing}
+                title={!canAnalyze ? getDisabledMessage() : "Analyze how well this job fits your profile"}
+                className={`px-3 py-2 text-sm font-medium rounded-lg transition-colors ${
+                  canAnalyze && !isAnalyzing
+                    ? 'bg-blue-600 text-white hover:bg-blue-700'
+                    : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                }`}
+              >
+                {isAnalyzing ? (
+                  <span className="flex items-center">
+                    <div className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full mr-2"></div>
+                    Analyzing...
+                  </span>
+                ) : existingAnalysis ? (
+                  'Re-analyze Job Fit'
+                ) : (
+                  'Analyze Job Fit'
+                )}
+              </button>
             </div>
-          ) : (
-            // EXPANDED: Show original comment text
-            <div className="text-sm text-gray-700 whitespace-pre-wrap">
-              {comment.text}
+            
+            {/* Analysis Results */}
+            {existingAnalysis && (
+              <div className="mt-4 p-3 bg-gray-50 rounded-lg border">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-sm font-medium text-gray-900">Job Fit Analysis</span>
+                  <div className="flex items-center gap-2">
+                    <span className={`px-2 py-1 text-xs rounded ${
+                      existingAnalysis.recommendation === 'apply' 
+                        ? 'bg-green-100 text-green-800'
+                        : existingAnalysis.recommendation === 'maybe'
+                        ? 'bg-yellow-100 text-yellow-800'
+                        : 'bg-red-100 text-red-800'
+                    }`}>
+                      {existingAnalysis.recommendation}
+                    </span>
+                    <span className="text-xs text-gray-500">
+                      Fit: {existingAnalysis.fitScore}/5
+                    </span>
+                  </div>
+                </div>
+                
+                <div className="text-sm text-gray-700 mb-2">
+                  <strong>Summary:</strong> {existingAnalysis.fitSummary}
+                </div>
+                
+                {existingAnalysis.whyGoodFit.length > 0 && (
+                  <div className="text-sm mb-2">
+                    <strong className="text-green-700">Good Fit:</strong>
+                    <ul className="mt-1 ml-4 list-disc text-gray-700">
+                      {existingAnalysis.whyGoodFit.map((item, index) => (
+                        <li key={index}>{item}</li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+                
+                {existingAnalysis.potentialConcerns.length > 0 && (
+                  <div className="text-sm">
+                    <strong className="text-red-700">Concerns:</strong>
+                    <ul className="mt-1 ml-4 list-disc text-gray-700">
+                      {existingAnalysis.potentialConcerns.map((item, index) => (
+                        <li key={index}>{item}</li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+          
+          {/* Collapsible original comment text */}
+          <Collapse in={isExpanded}>
+            <div className="mt-4 pt-4 border-t border-gray-100">
+              <div className="text-sm text-gray-700 whitespace-pre-wrap">
+                <SafeJobPosting content={comment.text} />
+              </div>
             </div>
-          )}
+          </Collapse>
         </div>
         
         {/* Collapse/Expand Button */}
         <button
           onClick={toggleExpanded}
           className="ml-4 p-1 text-gray-400 hover:text-gray-600 transition-colors"
-          title={isExpanded ? "Show job data" : "Show original comment"}
+          title={isExpanded ? "Hide original comment" : "Show original comment"}
         >
           {isExpanded ? (
             <ChevronUpIcon className="h-5 w-5" />

@@ -1,6 +1,5 @@
-import { parseHtml } from "@/lib/utils/decodeHtmlEntities";
 import { formatTime } from "@/lib/utils/formatTime";
-import ReactMarkdown from "react-markdown";
+import { SafeJobPosting } from "./SafeJobPosting";
 
 interface UnprocessedComment {
   commentId: string;
@@ -14,6 +13,7 @@ interface HackerNewsUnprocessedCommentProps {
   comment: UnprocessedComment;
 }
 
+  
 export default function HackerNewsUnprocessedComment({ comment }: HackerNewsUnprocessedCommentProps) {
   const getStatusBadgeStyles = (status: string) => {
     switch (status) {
@@ -42,7 +42,7 @@ export default function HackerNewsUnprocessedComment({ comment }: HackerNewsUnpr
       <div className="flex items-center gap-2 mb-2">
         <span className="font-medium text-gray-900">{comment.author}</span>
         <span className="text-sm text-gray-500">
-          {formatTime(comment.time)}
+          {formatTime(comment.time)}nfdiundkhj
         </span>
         <span className={`text-xs px-2 py-1 rounded ${getStatusBadgeStyles(comment.processingStatus)}`}>
           {comment.processingStatus}
@@ -54,9 +54,7 @@ export default function HackerNewsUnprocessedComment({ comment }: HackerNewsUnpr
       
       {/* Always show the original comment text for unprocessed comments */}
       <div className="prose prose-sm max-w-none ">
-      <ReactMarkdown >
-        {parseHtml(comment.text)}
-      </ReactMarkdown>
+        <SafeJobPosting content={comment.text} />
       </div>
       
       {/* Status message */}

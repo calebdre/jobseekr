@@ -13,6 +13,7 @@ import type {
   FilterApi,
   FunctionReference,
 } from "convex/server";
+import type * as bulkAnalysis from "../bulkAnalysis.js";
 import type * as hackernews from "../hackernews.js";
 
 /**
@@ -24,6 +25,7 @@ import type * as hackernews from "../hackernews.js";
  * ```
  */
 declare const fullApi: ApiFromModules<{
+  bulkAnalysis: typeof bulkAnalysis;
   hackernews: typeof hackernews;
 }>;
 export declare const api: FilterApi<

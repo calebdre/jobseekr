@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import { ConvexProvider, ConvexReactClient } from "convex/react";
+import '@mantine/core/styles.css';
 
+import { ColorSchemeScript, MantineProvider, mantineHtmlProps } from '@mantine/core';
 const geistSans = Geist({
     variable: "--font-geist-sans",
     subsets: ["latin"],
@@ -27,11 +28,19 @@ export default function RootLayout({
 }>) {
     return (
         
-            <html lang="en">
+            <html 
+                lang="en"
+                {...mantineHtmlProps}
+             >
+                 <head>
+                    <ColorSchemeScript />
+                </head>
                 <body
                     className={`${geistSans.variable} ${geistMono.variable} antialiased`}
                 >
-                    {children}
+                    <MantineProvider>
+                        {children}
+                    </MantineProvider>
                 </body>
             </html>
         

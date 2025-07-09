@@ -39,3 +39,10 @@ The project has evolved from a Python script to a full-featured web application 
 - Comprehensive SearchSession management
 - Production-ready deployment infrastructure
 - Rich UI with structured job analysis display
+
+
+Before making any changes to the code:
+1. review the existing related code and make sure that you have a solid understanding of the implications of the nature of what you're implementing
+2. double check whether the changes you're thinking about making are complete and don't have implications elsewhere in the code (e.g. if you're changing a function signature, make sure that all the places that call it are updated, or if you add a database field, make sure every insertion/update/deletion of that field is updated if necessary)
+4. don't make any assumptions about the code or what needs to be done - clarify any questions or hanging threads
+5. discuss your implementation plans

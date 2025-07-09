@@ -114,8 +114,8 @@ export const useHackernewsThreadsConvex = (threadId: string): UseHackernewsThrea
   const isProcessing = thread?.processingStatus === "processing" || thread?.processingStatus === "fetching";
   
   const progress = thread ? {
-    current: thread.processedComments || 0,
-    total: thread.totalComments || 0,
+    current: comments.filter(comment => comment.jobData).length,
+    total: comments.length,
   } : null;
   
   return {
