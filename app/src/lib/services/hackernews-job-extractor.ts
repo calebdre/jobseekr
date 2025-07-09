@@ -50,6 +50,7 @@ Extract the following information and return it as JSON:
   "technologies": ["tech1", "tech2"],
   "experienceLevel": "Junior, Mid, Senior, etc.",
   "contactInfo": "email or application instructions",
+  "isValidJobPosting": true,
   "confidence": 1-5
 }
 

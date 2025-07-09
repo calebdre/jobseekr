@@ -6,6 +6,7 @@ import { useAction, useQuery } from "convex/react";
 import { api } from "../../convex/_generated/api";
 import { SafeJobPosting } from './SafeJobPosting';
 import { HackerNewsComment as Comment, HackerNewsCommentProcessingStatus } from '@/types/hackernews';
+import { Doc } from '../../convex/_generated/dataModel';
 
 interface HackerNewsCommentProps {
     comment: Comment;
@@ -32,7 +33,7 @@ export default function HackerNewsComment({
       userId,
       commentId: comment._id as any,
     } : "skip"
-  );
+  ) as Doc<"hackernews_analyses"> | null;
 
   // Mutation to trigger job analysis
   const analyzeJobFit = useAction(api.hackernews.analyzeCommentJobFit);
@@ -94,6 +95,10 @@ export default function HackerNewsComment({
         return 'Waiting to be processed...';
     }
   };
+
+  if (existingAnalysis) {
+    console.log(existingAnalysis)
+  }
 
   return (
     <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
@@ -242,10 +247,14 @@ export default function HackerNewsComment({
                       </div>
                     </div>
                     
-                    <div className="text-sm text-gray-700 mb-2">
-                      <strong>Summary:</strong> {existingAnalysis.fitSummary}
-                    </div>
+                    <p className="text-sm text-gray-700 mb-2">
+                        {existingAnalysis.fitSummary}
+                    </p>
                     
+                    <div className="text-sm text-gray-700 mb-2">
+                     {existingAnalysis.analysis}
+                    </div>
+
                     {existingAnalysis.whyGoodFit.length > 0 && (
                       <div className="text-sm mb-2">
                         <strong className="text-green-700">Good Fit:</strong>
@@ -313,3 +322,5 @@ export default function HackerNewsComment({
     </div>
   );
 }
+
+    
