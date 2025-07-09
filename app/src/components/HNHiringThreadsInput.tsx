@@ -115,7 +115,7 @@ export default function HNHiringThreadsInput({
 
   useEffect(() => {
     fetchThreads();
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  }, []);
 
   const handleThreadChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const threadId = e.target.value;
