@@ -138,8 +138,8 @@ export const processNextBulkAnalysis = mutation({
     
     // Get session and check if still processing
     const session = await ctx.db.get(args.sessionId);
-    if (!session || session.status !== "processing") {
-      console.log(`Bulk analysis session ${args.sessionId} is not processing`);
+    if (!session) {
+      console.log(`Bulk analysis session ${args.sessionId} not found`);
       return { status: "cancelled" };
     }
     
@@ -147,6 +147,11 @@ export const processNextBulkAnalysis = mutation({
     if (session.status === "paused") {
       console.log(`Bulk analysis session ${args.sessionId} is paused`);
       return { status: "paused" };
+    }
+    
+    if (session.status !== "processing") {
+      console.log(`Bulk analysis session ${args.sessionId} is not processing`);
+      return { status: "cancelled" };
     }
     
     // Check rate limiting (same logic as job processing)
