@@ -13,7 +13,7 @@ export interface UseBulkAnalysisConvexReturn {
   loading: boolean;
   startAnalysis: (threadId: string, userId: string, resumeText: string, preferences: string) => void;
   pauseAnalysis: (userId: string) => void;
-  resumeAnalysis: (userId: string) => void;
+  resumeAnalysis: (userId: string, threadId: string, resumeText: string, preferences: string) => void;
 }
 
 export const useBulkAnalysisConvex = (threadId: string, userId: string): UseBulkAnalysisConvexReturn => {
@@ -25,7 +25,6 @@ export const useBulkAnalysisConvex = (threadId: string, userId: string): UseBulk
   // Actions and Mutations
   const startAnalysisAction = useAction(api.bulkAnalysis.startBulkAnalysis);
   const pauseAnalysisMutation = useMutation(api.bulkAnalysis.pauseBulkAnalysis);
-  const resumeAnalysisMutation = useMutation(api.bulkAnalysis.resumeBulkAnalysis);
   
   const loading = progressData === undefined;
   const session = progressData?.session || null;

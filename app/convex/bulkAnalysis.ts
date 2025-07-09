@@ -82,7 +82,7 @@ export const startBulkAnalysis = action({
         sessionId: a,
       });
       
-    return a;  
+    
   },
 });
 

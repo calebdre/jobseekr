@@ -132,10 +132,6 @@ export default function Home() {
     <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-4xl mx-auto">
         <div className="bg-white shadow-xl rounded-lg p-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-8 text-center">
-            Job Search Setup
-          </h1>
-          
           <form 
             // onSubmit={handleFormSubmit} 
             className="space-y-8"
