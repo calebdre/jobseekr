@@ -1,4 +1,5 @@
 import { useBulkAnalysisConvex } from '@/hooks/useBulkAnalysisConvex';
+import { Tooltip } from '@mantine/core';
 
 interface BulkAnalysisStatusProps {
   threadId: string;
@@ -27,6 +28,19 @@ export default function BulkAnalysisStatus({
 
   const isComplete = progress.remainingJobs === 0;
   const hasStarted = progress.completedJobs > 0;
+  
+  // Check if both resume and preferences are provided
+  const hasResume = resumeText?.trim().length > 0;
+  const hasPreferences = preferences?.trim().length > 0;
+  const canStartAnalysis = hasResume && hasPreferences;
+  
+  // Generate tooltip message for disabled state
+  const getDisabledMessage = () => {
+    if (!hasResume && !hasPreferences) return "Please provide both resume and job preferences to start analysis";
+    if (!hasResume) return "Please provide your resume to start analysis";
+    if (!hasPreferences) return "Please provide your job preferences to start analysis";
+    return "";
+  };
   
   const getStatusText = () => {
     if (isProcessing) return "Analyzing job fit...";
@@ -88,12 +102,22 @@ export default function BulkAnalysisStatus({
         )}
         
         {!hasStarted && !isProcessing && (
-          <button
-            onClick={() => startAnalysis(threadId, userId, resumeText, preferences)}
-            className="px-3 py-1 text-sm bg-purple-600 text-white rounded hover:bg-purple-700"
+          <Tooltip
+            label={!canStartAnalysis ? getDisabledMessage() : "Start analyzing job fit for all jobs"}
+            disabled={canStartAnalysis}
           >
-            Start Job Analysis
-          </button>
+            <button
+              onClick={() => startAnalysis(threadId, userId, resumeText, preferences)}
+              disabled={!canStartAnalysis}
+              className={`px-3 py-1 text-sm rounded transition-colors ${
+                canStartAnalysis
+                  ? 'bg-purple-600 text-white hover:bg-purple-700'
+                  : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+              }`}
+            >
+              Start Job Analysis
+            </button>
+          </Tooltip>
         )}
       </div>
     </div>

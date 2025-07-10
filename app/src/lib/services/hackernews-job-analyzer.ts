@@ -1,7 +1,7 @@
 import { JobAnalysis } from '../../types/job.types';
 import { runPromptWithTogetherAI } from "./llm";
 
-const hackerNewsJobPrompt = (resume: string, preferences: string, comment: string) => `You are analyzing a brief HackerNews job posting comment to help a job seeker decide if it's worth pursuing.
+const hackerNewsJobPrompt = (resume: string, preferences: string, comment: string) => `You are analyzing a brief HackerNews job posting comment to help someone decide if it's worth pursuing.
 
 RESUME:
 ${resume}
@@ -14,28 +14,28 @@ ${comment}
 
 This is a short, informal job posting from HackerNews - not a full job description. It might be just 1-3 sentences with basic info like company, role, tech stack, salary, and contact info.
 
-Your job is to quickly assess if this opportunity aligns with their background and preferences.
+Your job is to assess if this opportunity aligns with your background and preferences.
 
 ASSESSMENT CRITERIA:
 1. **Deal-breakers first**: Location requirements, work authorization, must-have skills
-2. **Experience match**: Do they have relevant background for this role?
+2. **Experience match**: Do you have relevant background for this role?
 3. **Preference alignment**: Tech stack, company stage, salary range, remote policy
 
 RECOMMENDATIONS:
-- **apply**: Good match with their background AND preferences, worth reaching out
+- **apply**: Good match with your background AND preferences, worth reaching out
 - **maybe**: Unclear from the brief posting, or mixed signals (some good fit, some concerns)
-- **skip**: Clear mismatch with their requirements or preferences
+- **skip**: Clear mismatch with your requirements or preferences
 
-Keep your analysis conversational and concise - this is a quick screening, not a deep dive.
+Write your analysis conversational and direct, like a trusted recruiter sending an honest email. 
+Address the person directly using "you" and "your" throughout your response.
 
 Respond with JSON in this EXACT format:
 {
   "recommendation": "apply|maybe|skip",
   "confidence": 1-5,
   "fitScore": 1-5,
-  "job_summary": "What role/company is this and what would they likely do?",
-  "company_summary": "What we know about the company from this brief posting",
   "fit_summary": "Why this is/isn't a good fit - lead with the most important reason",
+  "analysis": "Your bottom-line take: should they pursue this opportunity and why?"
   "why_good_fit": [
     "Specific matches with their background",
     "Aligns with their stated preferences"
@@ -43,15 +43,10 @@ Respond with JSON in this EXACT format:
   "potential_concerns": [
     "Missing information or red flags",
     "Potential mismatches"
-  ],
-  "summary": {
-    "role": "job title or 'Not specified'",
-    "company": "company name or 'Not specified'",
-    "location": "location/remote info or 'Not specified'",
-    "salary_range": "salary if mentioned or 'Not specified'"
-  },
-  "analysis": "Your bottom-line take: should they pursue this opportunity and why?"
-}`;
+  ]
+}
+  
+Response ONLY in JSON format without any additional text.`;
 
 export async function analyzeHackerNewsJob(
   comment: string,
@@ -64,7 +59,9 @@ export async function analyzeHackerNewsJob(
   try {
     console.log('Analyzing HackerNews job comment...');
     
-    const content = await runPromptWithTogetherAI(prompt);
+    const content = await runPromptWithTogetherAI(
+        prompt
+    );
     if (!content) {
       throw new Error("No response from AI");
     }
@@ -115,18 +112,10 @@ export async function analyzeHackerNewsJob(
     return {
       recommendation: 'maybe',
       fitScore: 3,
-      company_summary: 'Company summary not available due to AI service error',
       confidence: 1,
-      job_summary: 'Analysis unavailable due to AI service error',
       fit_summary: 'Could not analyze job fit due to technical issues',
       why_good_fit: [],
       potential_concerns: ['AI analysis failed - manual review recommended'],
-      summary: {
-        role: 'Not specified',
-        company: 'Not specified',
-        location: 'Not specified',
-        salary_range: 'Not specified',
-      },
       analysis: 'Could not analyze job fit due to technical issues. Manual review recommended.'
     };
   }

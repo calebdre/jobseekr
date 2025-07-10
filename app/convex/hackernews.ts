@@ -675,6 +675,7 @@ export const startProcessing = mutation({
   },
 });
 
+
 // Action for analyzing job fit with user's resume and preferences
 export const analyzeCommentJobFit = action({
   args: {
@@ -682,6 +683,7 @@ export const analyzeCommentJobFit = action({
     userId: v.string(),
     resumeText: v.string(),
     preferences: v.string(),
+    force: v.optional(v.boolean()),
   },
   handler: async (ctx, args): Promise<Doc<"hackernews_analyses">> => {
     // Get the comment to analyze
@@ -693,15 +695,17 @@ export const analyzeCommentJobFit = action({
       throw new Error(`Comment ${args.commentId} not found`);
     }
     
-    // Check if analysis already exists for this user/comment
-    const existingAnalysis: Doc<"hackernews_analyses"> | null = await ctx.runQuery(api.hackernews.getUserAnalysis, {
-      userId: args.userId,
-      commentId: args.commentId,
-    });
-    
-    if (existingAnalysis) {
-      console.log(`Analysis already exists for user ${args.userId} and comment ${args.commentId}`);
-      return existingAnalysis;
+    if (!args.force) {
+      // Check if analysis already exists for this user/comment
+      const existingAnalysis: Doc<"hackernews_analyses"> | null = await ctx.runQuery(api.hackernews.getUserAnalysis, {
+        userId: args.userId,
+        commentId: args.commentId,
+      });
+      
+      if (existingAnalysis) {
+        console.log(`Analysis already exists for user ${args.userId} and comment ${args.commentId}`);
+        return existingAnalysis;
+      }
     }
     
     try {
@@ -718,6 +722,7 @@ export const analyzeCommentJobFit = action({
         commentId: args.commentId,
         threadId: comment.threadId,
         analysis: analysis,
+        force: args.force,
       });
       
       return savedAnalysis;
@@ -736,34 +741,61 @@ export const saveJobAnalysis = mutation({
     commentId: v.id("hackernews_comments"),
     threadId: v.string(),
     analysis: v.any(), // JobAnalysis object
+    force: v.optional(v.boolean()),
   },
   handler: async (ctx, args): Promise<Doc<"hackernews_analyses">> => {
     const now = Date.now();
     
-    // Create analysis record
-    const analysisId: Id<"hackernews_analyses"> = await ctx.db.insert("hackernews_analyses", {
-      userId: args.userId,
-      commentId: args.commentId,
-      threadId: args.threadId,
-      recommendation: args.analysis.recommendation,
-      fitScore: args.analysis.fitScore,
-      confidence: args.analysis.confidence,
-      jobSummary: args.analysis.job_summary,
-      fitSummary: args.analysis.fit_summary,
-      companySummary: args.analysis.company_summary,
-      whyGoodFit: args.analysis.why_good_fit,
-      potentialConcerns: args.analysis.potential_concerns,
-      summary: args.analysis.summary,
-      analysis: args.analysis.analysis,
-      createdAt: now,
-    });
+    // Check if analysis already exists
+    const existingAnalysis = await ctx.db
+      .query("hackernews_analyses")
+      .withIndex("by_user_and_comment", (q) => 
+        q.eq("userId", args.userId).eq("commentId", args.commentId)
+      )
+      .first();
     
-    // Return the created analysis
-    const result = await ctx.db.get(analysisId);
-    if (!result) {
-      throw new Error("Failed to create analysis record");
+    if (existingAnalysis && args.force) {
+      // Update existing analysis
+      await ctx.db.patch(existingAnalysis._id, {
+        recommendation: args.analysis.recommendation,
+        fitScore: args.analysis.fitScore,
+        confidence: args.analysis.confidence,
+        fitSummary: args.analysis.fit_summary,
+        whyGoodFit: args.analysis.why_good_fit,
+        potentialConcerns: args.analysis.potential_concerns,
+        analysis: args.analysis.analysis,
+        createdAt: now, // Update timestamp to show it was re-analyzed
+      });
+      
+      // Return the updated analysis
+      const result = await ctx.db.get(existingAnalysis._id);
+      if (!result) {
+        throw new Error("Failed to update analysis record");
+      }
+      return result;
+    } else {
+      // Create new analysis record
+      const analysisId: Id<"hackernews_analyses"> = await ctx.db.insert("hackernews_analyses", {
+        userId: args.userId,
+        commentId: args.commentId,
+        threadId: args.threadId,
+        recommendation: args.analysis.recommendation,
+        fitScore: args.analysis.fitScore,
+        confidence: args.analysis.confidence,
+        fitSummary: args.analysis.fit_summary,
+        whyGoodFit: args.analysis.why_good_fit,
+        potentialConcerns: args.analysis.potential_concerns,
+        analysis: args.analysis.analysis,
+        createdAt: now,
+      });
+      
+      // Return the created analysis
+      const result = await ctx.db.get(analysisId);
+      if (!result) {
+        throw new Error("Failed to create analysis record");
+      }
+      return result;
     }
-    return result;
   },
 });
 

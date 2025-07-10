@@ -63,14 +63,15 @@ export default defineSchema({
     ),
     fitScore: v.number(),
     confidence: v.number(),
-    jobSummary: v.string(),
     fitSummary: v.string(),
-    companySummary: v.string(),
     whyGoodFit: v.array(v.string()),
     potentialConcerns: v.array(v.string()),
-    summary: v.any(),
     analysis: v.optional(v.string()),
     createdAt: v.number(),
+    // Legacy fields for backward compatibility with existing data
+    companySummary: v.optional(v.any()),
+    jobSummary: v.optional(v.string()),
+    summary: v.optional(v.any()),
   })
     .index("by_user_and_comment", ["userId", "commentId"])
     .index("by_user_and_thread", ["userId", "threadId"])

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { ChevronDownIcon, ChevronUpIcon } from 'lucide-react';
-import { Button, Collapse } from '@mantine/core';
+import { Button, Collapse, Tooltip } from '@mantine/core';
 import { formatTime } from "@/lib/utils/formatTime";
 import { useAction, useQuery } from "convex/react";
 import { api } from "../../convex/_generated/api";
@@ -65,6 +65,7 @@ export default function HackerNewsComment({
         userId,
         resumeText: resumeText!,
         preferences: preferences!,
+        force: true,
       });
     } catch (error) {
       console.error('Failed to analyze job fit:', error);
@@ -193,27 +194,31 @@ export default function HackerNewsComment({
                 {/* Job Fit Analysis Button */}
                 {userId && (
                   <div className="mt-3 pt-3 border-t border-gray-100 space-x-4 flex items-center">
-                    <button
-                      onClick={handleAnalyzeJobFit}
-                      disabled={!canAnalyze || isAnalyzing}
-                      title={!canAnalyze ? getDisabledMessage() : "Analyze how well this job fits your profile"}
-                      className={`px-3 py-2 text-sm font-medium rounded-lg transition-colors ${
-                        canAnalyze && !isAnalyzing
-                          ? 'bg-blue-600 text-white hover:bg-blue-700'
-                          : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                      }`}
+                    <Tooltip
+                      label={!canAnalyze ? getDisabledMessage() : "Analyze how well this job fits your profile"}
+                      disabled={canAnalyze && !isAnalyzing}
                     >
-                      {isAnalyzing ? (
-                        <span className="flex items-center">
-                          <div className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full mr-2"></div>
-                          Analyzing...
-                        </span>
-                      ) : existingAnalysis ? (
-                        'Re-analyze Job Fit'
-                      ) : (
-                        'Analyze Job Fit'
-                      )}
-                    </button>
+                      <button
+                        onClick={handleAnalyzeJobFit}
+                        disabled={!canAnalyze || isAnalyzing}
+                        className={`px-3 py-2 text-sm font-medium rounded-lg transition-colors ${
+                          canAnalyze && !isAnalyzing
+                            ? 'bg-blue-600 text-white hover:bg-blue-700'
+                            : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                        }`}
+                      >
+                        {isAnalyzing ? (
+                          <span className="flex items-center">
+                            <div className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full mr-2"></div>
+                            Analyzing...
+                          </span>
+                        ) : existingAnalysis ? (
+                          'Re-analyze Job Fit'
+                        ) : (
+                          'Analyze Job Fit'
+                        )}
+                      </button>
+                    </Tooltip>
 
                     <Button
                      variant="subtle"

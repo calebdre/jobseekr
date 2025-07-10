@@ -1,4 +1,5 @@
 import Together from "together-ai";
+import { CompletionCreateParams } from "together-ai/resources/chat/completions";
 
 export class RateLimitError extends Error {
   constructor(message: string, public retryAfter?: number) {
@@ -7,7 +8,10 @@ export class RateLimitError extends Error {
   }
 }
 
-export const runPromptWithTogetherAI = async (prompt: string) => {
+export const runPromptWithTogetherAI = async (
+    prompt: string,
+    responseFormat?: CompletionCreateParams.ResponseFormat
+) => {
     const together = new Together({
       apiKey: process.env.TOGETHERAI_API_KEY
     });
@@ -23,8 +27,10 @@ export const runPromptWithTogetherAI = async (prompt: string) => {
         // model: "meta-llama/Llama-3.3-70B-Instruct-Turbo-Free",
         model: "deepseek-ai/DeepSeek-R1-Distill-Llama-70B-free",
         // model: "lgai/exaone-deep-32b",
-        temperature: 0.6,
-        max_tokens: 4096
+        temperature: 0.4,
+        max_tokens: 4096,
+        response_format: responseFormat,
+        
       });
     
       console.log(`Together AI response: ${JSON.stringify(response, null, 2)}`)

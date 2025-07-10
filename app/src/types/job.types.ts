@@ -11,12 +11,9 @@ export interface JobAnalysis {
   recommendation: 'apply' | 'maybe' | 'skip';
   fitScore: number; // 1-5
   confidence: number; // 1-5
-  job_summary: string;
   fit_summary: string;
-  company_summary: string;
   why_good_fit: string[];
   potential_concerns: string[];
-  summary: JobSummary;
   analysis: string; // Keep for backward compatibility
 }
 
